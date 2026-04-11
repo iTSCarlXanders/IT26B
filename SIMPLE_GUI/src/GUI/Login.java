@@ -49,6 +49,7 @@ public class Login extends javax.swing.JFrame {
 
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jTextField1.setFont(new java.awt.Font("Segoe Script", 0, 12)); // NOI18N
         jTextField1.setText("Clan ID");
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -57,13 +58,16 @@ public class Login extends javax.swing.JFrame {
         });
         jPanel3.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 210, 36));
 
+        jTextField2.setFont(new java.awt.Font("Segoe Script", 0, 12)); // NOI18N
         jTextField2.setText("Chakra Key");
         jPanel3.add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 210, 36));
 
+        jLabel1.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
         jLabel1.setText("LOG IN");
         jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 20, 56, 36));
 
         jButton1.setBackground(new java.awt.Color(153, 0, 0));
+        jButton1.setFont(new java.awt.Font("Segoe Script", 1, 14)); // NOI18N
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setLabel("ACCESS PORTAL");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -73,11 +77,13 @@ public class Login extends javax.swing.JFrame {
         });
         jPanel3.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 210, 35));
 
+        jLabel2.setFont(new java.awt.Font("Segoe Script", 0, 12)); // NOI18N
         jLabel2.setText("Forgot Key?");
         jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 210, -1, -1));
 
+        jLabel3.setFont(new java.awt.Font("Segoe Script", 0, 12)); // NOI18N
         jLabel3.setText("Not Registered?");
-        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 210, -1, -1));
+        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 210, 100, -1));
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/GUI/scroll s (8).png"))); // NOI18N
         jLabel8.setText("jLabel8");
@@ -87,16 +93,17 @@ public class Login extends javax.swing.JFrame {
 
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLabel4.setFont(new java.awt.Font("Segoe Script", 0, 18)); // NOI18N
         jLabel4.setText("SHINOBI ACCESS PORTAL");
-        jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 0, 160, 40));
+        jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 260, 40));
 
         jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/GUI/s1.png"))); // NOI18N
-        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 0, -1, 40));
+        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, -10, 40, 50));
 
-        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/GUI/scroll (2).png"))); // NOI18N
-        jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(-30, -20, -1, -1));
+        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/GUI/scroll p.png"))); // NOI18N
+        jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(-50, -20, 380, -1));
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 150, 280, 40));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 150, 330, 40));
 
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/GUI/BACKGROUND LOGIN.png"))); // NOI18N
         jLabel6.setText("jLabel6");
