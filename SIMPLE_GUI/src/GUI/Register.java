@@ -43,11 +43,8 @@ public class Register extends javax.swing.JFrame {
         // This ensures checkboxes are on top of the background image
         jPanel2.setComponentZOrder(jCheckBox1, 0);
         jPanel2.setComponentZOrder(jCheckBox2, 0);
-        // Change jCheckBox1 to 330 (Level with the first password field)
-jPanel2.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 330, -1, -1));
-
-// Change jCheckBox2 to 380 (Level with the second password field)
-jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 380, -1, -1));
+        jPanel2.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 330, -1, -1));
+        jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 380, -1, -1));
         jPanel2.revalidate();
         jPanel2.repaint();
     }
@@ -126,6 +123,7 @@ jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 3
         jLabel5 = new javax.swing.JLabel();
         jPasswordField1 = new javax.swing.JPasswordField();
         jPasswordField2 = new javax.swing.JPasswordField();
+        jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
@@ -213,6 +211,9 @@ jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 3
 
         jPasswordField2.setText("jPasswordField2");
         jPanel2.add(jPasswordField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 370, 200, 30));
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/GUI/scroll s (8) (5).png"))); // NOI18N
+        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(-100, 0, 420, 510));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 10, 270, 500));
 
@@ -308,6 +309,7 @@ jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 3
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
