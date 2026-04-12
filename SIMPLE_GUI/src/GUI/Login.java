@@ -244,7 +244,14 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_jCheckBox2ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+        // 1. Create an instance of your Register frame
+    Register registerPage = new Register(); 
+    
+    // 2. Make the Register window appear
+    registerPage.setVisible(true);
+    
+    // 3. Close the current Login window
+    this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
