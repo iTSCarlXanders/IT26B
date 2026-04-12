@@ -17,8 +17,10 @@ public class Dashboard extends javax.swing.JFrame {
 
     private ArrayList<String[]> players = new ArrayList<>();
     private ArrayList<String[]> undoStack = new ArrayList<>();
-
-    public Dashboard() {
+    private String loggedInUser;
+    
+    public Dashboard(String username) {
+        this.loggedInUser = username; 
         initComponents();
         stylizeInterface();
         this.setLocationRelativeTo(null);
@@ -28,9 +30,8 @@ public class Dashboard extends javax.swing.JFrame {
     }
 
     private void loadInitialData() {
-        players.add(new String[]{"Naruto Uzumaki", "5000", "Rasengan", "Konoha"});
-        players.add(new String[]{"Sasuke Uchiha", "4500", "Chidori", "Konoha"});
-        players.add(new String[]{"Kakashi Hatake", "3500", "Kamui", "Konoha"});
+        // Automatically adds the person who logged in to the table
+        players.add(new String[]{loggedInUser, "1000", "Genin", "Unknown Village"});
     }
 
     private void refreshTable() {
@@ -41,25 +42,13 @@ public class Dashboard extends javax.swing.JFrame {
         }
     }
 
-    // --- SORTING LOGIC ---
-    private void bubbleSortByName() {
-        for (int i = 0; i < players.size() - 1; i++) {
-            for (int j = 0; j < players.size() - i - 1; j++) {
-                if (players.get(j)[0].compareToIgnoreCase(players.get(j + 1)[0]) > 0) {
-                    String[] temp = players.get(j);
-                    players.set(j, players.get(j + 1));
-                    players.set(j + 1, temp);
-                }
-            }
-        }
-    }
-
     private void stylizeInterface() {
         jPanel2.setOpaque(false);
         jScrollPane1.setOpaque(false);
         jScrollPane1.getViewport().setOpaque(false);
         jTable1.setOpaque(false);
         
+        // I put 'create' back into the array so it stays transparent!
         JButton[] btns = {undo, create, read, delete, Logout};
         for (JButton b : btns) {
             b.setOpaque(false);
@@ -233,7 +222,7 @@ public class Dashboard extends javax.swing.JFrame {
     if (confirm == javax.swing.JOptionPane.YES_OPTION) {
         // Open the Login Frame
         // Note: Make sure 'LoginFrame' is the actual name of your login class!
-        new LoginFrame().setVisible(true); 
+        new Login().setVisible(true); 
         
         // 3. Close (dispose) the current Dashboard
         this.dispose(); 
@@ -241,7 +230,8 @@ public class Dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_LogoutActionPerformed
 
     public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> new Dashboard().setVisible(true));
+        // Main now passes a placeholder "Guest" so it doesn't crash
+        java.awt.EventQueue.invokeLater(() -> new Dashboard("Guest").setVisible(true));
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Logout;

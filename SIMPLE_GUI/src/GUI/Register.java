@@ -24,6 +24,7 @@ public class Register extends javax.swing.JFrame {
    public Register() {
     initComponents();
     this.setLocationRelativeTo(null); 
+    
 
     // 1. Clean up Checkbox appearance
     jCheckBox1.setOpaque(false);
@@ -32,12 +33,12 @@ public class Register extends javax.swing.JFrame {
     jCheckBox2.setText("");
 
     // 2. Setup Placeholders
-    setupField(jTextField1, "Shinobi Name: (Username)");
-    setupField(jTextField2, "Clan Lineage:");
-    setupField(jTextField3, "Communication Toad: (Email)");
-    setupField(jTextField6, "Elemental Affinity (Chakra)");
-    setupField(jPasswordField1, "Forbidden Seal: (Password)");
-    setupField(jPasswordField2, "Confirm Password:");
+    setupField(username, "Shinobi Name: (Username)");
+    setupField(clan, "Clan Lineage:");
+    setupField(email, "Communication Toad: (Email)");
+    setupField(Origin, "Village Origin");
+    setupField(password, "Forbidden Seal: (Password)");
+    setupField(confirmpass, "Confirm Password:");
 
     // 3. THE PERFECT FIX FOR ABSOLUTE LAYOUT:
     // Force checkboxes to the very front
@@ -71,8 +72,8 @@ public class Register extends javax.swing.JFrame {
                     textField.setForeground(new Color(46, 26, 5)); // Ink Brown
                     if (textField instanceof JPasswordField jPasswordField) {
                         // Use dots only if we aren't clicking the "show password" box
-                        if (!(textField == jPasswordField1 && jCheckBox1.isSelected()) && 
-                            !(textField == jPasswordField2 && jCheckBox2.isSelected())) {
+                        if (!(textField == password && jCheckBox1.isSelected()) && 
+                            !(textField == confirmpass && jCheckBox2.isSelected())) {
                             jPasswordField.setEchoChar('•');
                         }
                     }
@@ -91,7 +92,8 @@ public class Register extends javax.swing.JFrame {
             }
         });
     }
-
+    public static String registeredUser = "";
+    public static String registeredPass = "";
     private void togglePassword(JPasswordField field, javax.swing.JCheckBox check, String hint) {
     String currentText = field.getText();
     
@@ -117,15 +119,15 @@ public class Register extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jCheckBox1 = new javax.swing.JCheckBox();
         jCheckBox2 = new javax.swing.JCheckBox();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField6 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        username = new javax.swing.JTextField();
+        clan = new javax.swing.JTextField();
+        email = new javax.swing.JTextField();
+        Origin = new javax.swing.JTextField();
+        signup = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
-        jPasswordField1 = new javax.swing.JPasswordField();
-        jPasswordField2 = new javax.swing.JPasswordField();
-        jButton2 = new javax.swing.JButton();
+        password = new javax.swing.JPasswordField();
+        confirmpass = new javax.swing.JPasswordField();
+        back = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
@@ -152,85 +154,87 @@ public class Register extends javax.swing.JFrame {
         jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 380, -1, -1));
         jCheckBox2.getAccessibleContext().setAccessibleParent(jCheckBox1);
 
-        jTextField1.setBackground(new java.awt.Color(204, 204, 204));
-        jTextField1.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
-        jTextField1.setText("Shinobi Name: (Username)");
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        username.setBackground(new java.awt.Color(204, 204, 204));
+        username.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
+        username.setText("Shinobi Name: (Username)");
+        username.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                usernameActionPerformed(evt);
             }
         });
-        jPanel2.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 170, 198, 34));
+        jPanel2.add(username, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 120, 198, 34));
 
-        jTextField2.setBackground(new java.awt.Color(204, 204, 204));
-        jTextField2.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
-        jTextField2.setText("Clan Lineage:");
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        clan.setBackground(new java.awt.Color(204, 204, 204));
+        clan.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
+        clan.setText("Clan Lineage:");
+        clan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                clanActionPerformed(evt);
             }
         });
-        jPanel2.add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 220, 198, 34));
+        jPanel2.add(clan, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 220, 198, 34));
 
-        jTextField3.setBackground(new java.awt.Color(204, 204, 204));
-        jTextField3.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
-        jTextField3.setText("Communication Toad: (Email) ");
-        jTextField3.addActionListener(new java.awt.event.ActionListener() {
+        email.setBackground(new java.awt.Color(204, 204, 204));
+        email.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
+        email.setText("Email: ");
+        email.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField3ActionPerformed(evt);
+                emailActionPerformed(evt);
             }
         });
-        jPanel2.add(jTextField3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 120, -1, 34));
+        jPanel2.add(email, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 170, 200, 34));
 
-        jTextField6.setBackground(new java.awt.Color(204, 204, 204));
-        jTextField6.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
-        jTextField6.setText("Elemental Affinity(Chakra)");
-        jTextField6.addActionListener(new java.awt.event.ActionListener() {
+        Origin.setBackground(new java.awt.Color(204, 204, 204));
+        Origin.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
+        Origin.setText("Village Origin");
+        Origin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField6ActionPerformed(evt);
+                OriginActionPerformed(evt);
             }
         });
-        jPanel2.add(jTextField6, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 270, 198, 37));
+        jPanel2.add(Origin, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 270, 198, 37));
 
-        jButton1.setBackground(new java.awt.Color(51, 51, 51));
-        jButton1.setFont(new java.awt.Font("Segoe Print", 1, 18)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("Sign Up");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        signup.setBackground(new java.awt.Color(51, 51, 51));
+        signup.setFont(new java.awt.Font("Segoe Print", 1, 18)); // NOI18N
+        signup.setForeground(new java.awt.Color(255, 255, 255));
+        signup.setText("Sign Up");
+        signup.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                signupActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(138, 420, -1, -1));
+        jPanel2.add(signup, new org.netbeans.lib.awtextra.AbsoluteConstraints(138, 420, -1, -1));
 
         jLabel5.setFont(new java.awt.Font("Segoe Print", 1, 24)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(204, 204, 204));
         jLabel5.setText("Shinobi Enrollment");
-        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 250, -1));
+        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 250, -1));
 
-        jPasswordField1.setBackground(new java.awt.Color(204, 204, 204));
-        jPasswordField1.setText("jPasswordField1");
-        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
+        password.setBackground(new java.awt.Color(204, 204, 204));
+        password.setFont(new java.awt.Font("Segoe Script", 0, 12)); // NOI18N
+        password.setText("jPasswordField1");
+        password.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jPasswordField1ActionPerformed(evt);
+                passwordActionPerformed(evt);
             }
         });
-        jPanel2.add(jPasswordField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 200, 30));
+        jPanel2.add(password, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 200, 30));
 
-        jPasswordField2.setBackground(new java.awt.Color(204, 204, 204));
-        jPasswordField2.setText("jPasswordField2");
-        jPanel2.add(jPasswordField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 370, 200, 30));
+        confirmpass.setBackground(new java.awt.Color(204, 204, 204));
+        confirmpass.setFont(new java.awt.Font("Segoe Script", 0, 12)); // NOI18N
+        confirmpass.setText("jPasswordField2");
+        jPanel2.add(confirmpass, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 370, 200, 30));
 
-        jButton2.setBackground(new java.awt.Color(51, 51, 51));
-        jButton2.setFont(new java.awt.Font("Segoe Print", 1, 15)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("BACK");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        back.setBackground(new java.awt.Color(51, 51, 51));
+        back.setFont(new java.awt.Font("Segoe Print", 1, 15)); // NOI18N
+        back.setForeground(new java.awt.Color(255, 255, 255));
+        back.setText("BACK");
+        back.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                backActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 420, 80, 40));
+        jPanel2.add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 420, 80, 40));
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/GUI/BSCROLL.png"))); // NOI18N
         jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(-100, 0, 420, 500));
@@ -271,40 +275,87 @@ public class Register extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    private void clanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clanActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_clanActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void usernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_usernameActionPerformed
 
-    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
+    private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField3ActionPerformed
+    }//GEN-LAST:event_emailActionPerformed
 
-    private void jTextField6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField6ActionPerformed
+    private void OriginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OriginActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField6ActionPerformed
+    }//GEN-LAST:event_OriginActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void signupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signupActionPerformed
+        // 1. Capture all inputs
+        String user = username.getText().trim();
+        String clanLineage = clan.getText().trim();
+        String mail = email.getText().trim();
+        String village = Origin.getText().trim();
+        String pass1 = new String(password.getPassword());
+        String pass2 = new String(confirmpass.getPassword());
 
-    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
+        // 2. THE GATEKEEPER: Check if ANY field is empty or still a placeholder
+        if (user.isEmpty() || user.equals("Shinobi Name: (Username)") ||
+            clanLineage.isEmpty() || clanLineage.equals("Clan Lineage:") ||
+            mail.isEmpty() || mail.equals("Communication Toad: (Email)") ||
+            village.isEmpty() || village.equals("Village Origin") ||
+            pass1.isEmpty() || pass1.equals("Forbidden Seal: (Password)") ||
+            pass2.isEmpty() || pass2.equals("Confirm Password:")) {
+            
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "All scrolls must be filled before enrollment! Do not leave any blanks.", 
+                "Incomplete Jutsu", 
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return; // Stops the process
+        }
+
+        // 3. THE CONFIRMATION: Check if passwords match
+        if (!pass1.equals(pass2)) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "The Forbidden Seals do not match! Check your confirmation.", 
+                "Chakra Mismatch", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+            return; // Stops the process
+        }
+
+        // 4. THE SAVINGS: Write to registry.txt
+        try {
+            java.io.FileWriter writer = new java.io.FileWriter("registry.txt", true);
+            // Saving only Username and Password for the login check
+            writer.write(user + "," + pass1 + "\n");
+            writer.close();
+
+            javax.swing.JOptionPane.showMessageDialog(this, "Enrollment Successful!\nYou may now enter the portal.");
+            
+            // 5. THE TRANSITION: Go to Login
+            new Login().setVisible(true);
+            this.dispose();
+
+        } catch (java.io.IOException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "The Village Scroll is locked. Error saving data.");
+        }
+    }//GEN-LAST:event_signupActionPerformed
+
+    private void passwordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jPasswordField1ActionPerformed
+    }//GEN-LAST:event_passwordActionPerformed
 
     private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
 
-         togglePassword(jPasswordField2, jCheckBox2, "Confirm Password:");
+         togglePassword(confirmpass, jCheckBox2, "Confirm Password:");
     }//GEN-LAST:event_jCheckBox2ActionPerformed
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
-       togglePassword(jPasswordField1, jCheckBox1, "Forbidden Seal: (Password)");
+       togglePassword(password, jCheckBox1, "Forbidden Seal: (Password)");
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
     Login loginPage = new Login(); 
     
     // 2. Show the Login window
@@ -312,7 +363,7 @@ public class Register extends javax.swing.JFrame {
     
     // 3. Close the current Register window
     this.dispose();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_backActionPerformed
 
     /**
      * @param args the command line arguments
@@ -333,8 +384,11 @@ public class Register extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JTextField Origin;
+    private javax.swing.JButton back;
+    private javax.swing.JTextField clan;
+    private javax.swing.JPasswordField confirmpass;
+    private javax.swing.JTextField email;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;
@@ -344,12 +398,9 @@ public class Register extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPasswordField jPasswordField1;
-    private javax.swing.JPasswordField jPasswordField2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField6;
+    private javax.swing.JPasswordField password;
+    private javax.swing.JButton signup;
+    private javax.swing.JTextField username;
     // End of variables declaration//GEN-END:variables
 
 }

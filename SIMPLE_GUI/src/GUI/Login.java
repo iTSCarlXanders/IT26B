@@ -217,24 +217,49 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void accessportalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accessportalActionPerformed
-       String user = Username.getText().trim();
-        String pass = new String(password.getPassword());
-
-        // Basic validation to check if placeholders are still there
-        if (user.equals("Clan ID") || pass.equals("Chakra Key") || user.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter your credentials.", "Portal Denied", JOptionPane.WARNING_MESSAGE);
+       String typedUser = Username.getText().trim();
+        String typedPass = new String(password.getPassword());
+        
+        // Prevent login if placeholders are still present
+        if (typedUser.equals("Clan ID") || typedPass.equals("Chakra Key")) {
+            JOptionPane.showMessageDialog(this, "Please enter your credentials.");
             return;
         }
 
-        // Authentication Check
-        if (user.equals("Admin") && pass.equals("1234")) {
-            JOptionPane.showMessageDialog(this, "Access Granted, Shinobi!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            
-            // Open Dashboard and Close Login
-            new Dashboard().setVisible(true);
+        boolean found = false;
+
+        // Admin override
+        if (typedUser.equals("Admin") && typedPass.equals("1234")) {
+            found = true;
+        } else {
+            try {
+                java.io.File file = new java.io.File("registry.txt");
+                if (file.exists()) {
+                    java.util.Scanner scanner = new java.util.Scanner(file);
+                    while (scanner.hasNextLine()) {
+                        String line = scanner.nextLine();
+                        String[] details = line.split(","); 
+                        if (details.length >= 2) {
+                            if (details[0].equals(typedUser) && details[1].equals(typedPass)) {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    scanner.close();
+                }
+            } catch (java.io.FileNotFoundException e) {
+                System.out.println("No registry file found.");
+            }
+        }
+
+        if (found) {
+            JOptionPane.showMessageDialog(this, "Access Granted!");
+            // CRITICAL FIX: Pass the username to the Dashboard
+            new Dashboard(typedUser).setVisible(true);
             this.dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Invalid Clan ID or Chakra Key!", "Access Denied", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Invalid credentials!", "Denied", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_accessportalActionPerformed
 
@@ -259,7 +284,7 @@ public class Login extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ex) {
+        } catch (Exception ex) {
             logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
         java.awt.EventQueue.invokeLater(() -> new Login().setVisible(true));
