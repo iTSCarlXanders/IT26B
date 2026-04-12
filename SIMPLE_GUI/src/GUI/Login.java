@@ -116,6 +116,7 @@ public class Login extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         accessportal = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
@@ -165,13 +166,17 @@ public class Login extends javax.swing.JFrame {
         jPanel3.add(accessportal, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 200, 35));
 
         jButton2.setFont(new java.awt.Font("Segoe Script", 0, 12)); // NOI18N
-        jButton2.setText("Not Registered?");
+        jButton2.setText("Register");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel3.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 210, 130, -1));
+        jPanel3.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 210, 80, -1));
+
+        jLabel2.setFont(new java.awt.Font("Segoe Script", 0, 14)); // NOI18N
+        jLabel2.setText("Start your journey?");
+        jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 210, 150, 30));
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/GUI/scroll s (8).png"))); // NOI18N
         jLabel8.setText("jLabel8");
@@ -295,6 +300,7 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JButton accessportal;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
