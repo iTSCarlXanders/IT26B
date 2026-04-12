@@ -5,6 +5,9 @@
 package GUI;
 
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -30,8 +33,25 @@ public class Dashboard extends javax.swing.JFrame {
     }
 
     private void loadInitialData() {
-        // Automatically adds the person who logged in to the table
-        players.add(new String[]{loggedInUser, "1000", "Genin", "Unknown Village"});
+        String village = "Unknown Village"; // Default if not found
+        
+        // READ registry.txt to find the specific user's village
+        try (BufferedReader br = new BufferedReader(new FileReader("registry.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] details = line.split(",");
+                // Assuming format: Username,Password,Village
+                if (details.length >= 3 && details[0].equalsIgnoreCase(loggedInUser)) {
+                    village = details[2];
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading registry: " + e.getMessage());
+        }
+
+        // Automatically adds the person who logged in with their actual village
+        players.add(new String[]{loggedInUser, "1000", "Genin", village});
     }
 
     private void refreshTable() {
@@ -48,7 +68,6 @@ public class Dashboard extends javax.swing.JFrame {
         jScrollPane1.getViewport().setOpaque(false);
         jTable1.setOpaque(false);
         
-        // I put 'create' back into the array so it stays transparent!
         JButton[] btns = {undo, create, read, delete, Logout};
         for (JButton b : btns) {
             b.setOpaque(false);
@@ -213,19 +232,15 @@ public class Dashboard extends javax.swing.JFrame {
     private void LogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogoutActionPerformed
     int confirm = javax.swing.JOptionPane.showConfirmDialog(
         this, 
-        "Are you sure you want to log out, Shinobi?", 
-        "Confirm Logout", 
-        javax.swing.JOptionPane.YES_NO_OPTION
+        "Are you sure you want to exit the application?", 
+        "Confirm Exit", 
+        javax.swing.JOptionPane.YES_NO_OPTION,
+        javax.swing.JOptionPane.WARNING_MESSAGE
     );
 
-    // 2. If they click "YES"
     if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-        // Open the Login Frame
-        // Note: Make sure 'LoginFrame' is the actual name of your login class!
-        new Login().setVisible(true); 
-        
-        // 3. Close (dispose) the current Dashboard
-        this.dispose(); 
+        // This shuts down the Java Virtual Machine (JVM) immediately
+        System.exit(0); 
     }
     }//GEN-LAST:event_LogoutActionPerformed
 

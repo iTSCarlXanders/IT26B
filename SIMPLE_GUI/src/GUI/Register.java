@@ -10,6 +10,9 @@ import java.awt.Color;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import javax.swing.UnsupportedLookAndFeelException;
+import java.io.FileWriter;
+import java.io.IOException;
+import javax.swing.JOptionPane;
 /**
  *
  * @author user
@@ -292,7 +295,6 @@ public class Register extends javax.swing.JFrame {
     }//GEN-LAST:event_OriginActionPerformed
 
     private void signupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signupActionPerformed
-        // 1. Capture all inputs
         String user = username.getText().trim();
         String clanLineage = clan.getText().trim();
         String mail = email.getText().trim();
@@ -300,7 +302,7 @@ public class Register extends javax.swing.JFrame {
         String pass1 = new String(password.getPassword());
         String pass2 = new String(confirmpass.getPassword());
 
-        // 2. THE GATEKEEPER: Check if ANY field is empty or still a placeholder
+        // Validation
         if (user.isEmpty() || user.equals("Shinobi Name: (Username)") ||
             clanLineage.isEmpty() || clanLineage.equals("Clan Lineage:") ||
             mail.isEmpty() || mail.equals("Communication Toad: (Email)") ||
@@ -308,37 +310,23 @@ public class Register extends javax.swing.JFrame {
             pass1.isEmpty() || pass1.equals("Forbidden Seal: (Password)") ||
             pass2.isEmpty() || pass2.equals("Confirm Password:")) {
             
-            javax.swing.JOptionPane.showMessageDialog(this, 
-                "All scrolls must be filled before enrollment! Do not leave any blanks.", 
-                "Incomplete Jutsu", 
-                javax.swing.JOptionPane.WARNING_MESSAGE);
-            return; // Stops the process
+            JOptionPane.showMessageDialog(this, "All scrolls must be filled!", "Incomplete Jutsu", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
-        // 3. THE CONFIRMATION: Check if passwords match
         if (!pass1.equals(pass2)) {
-            javax.swing.JOptionPane.showMessageDialog(this, 
-                "The Forbidden Seals do not match! Check your confirmation.", 
-                "Chakra Mismatch", 
-                javax.swing.JOptionPane.ERROR_MESSAGE);
-            return; // Stops the process
+            JOptionPane.showMessageDialog(this, "The Forbidden Seals do not match!", "Chakra Mismatch", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
-        // 4. THE SAVINGS: Write to registry.txt
-        try {
-            java.io.FileWriter writer = new java.io.FileWriter("registry.txt", true);
-            // Saving only Username and Password for the login check
-            writer.write(user + "," + pass1 + "\n");
-            writer.close();
-
-            javax.swing.JOptionPane.showMessageDialog(this, "Enrollment Successful!\nYou may now enter the portal.");
-            
-            // 5. THE TRANSITION: Go to Login
+        // Saving Data
+        try (FileWriter writer = new FileWriter("registry.txt", true)) {
+            writer.write(user + "," + pass1 + "," + village + "\n");
+            JOptionPane.showMessageDialog(this, "Enrollment Successful!\nYou may now enter the portal.");
             new Login().setVisible(true);
             this.dispose();
-
-        } catch (java.io.IOException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "The Village Scroll is locked. Error saving data.");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "The Village Scroll is locked. Error saving data.");
         }
     }//GEN-LAST:event_signupActionPerformed
 
