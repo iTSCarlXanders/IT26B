@@ -38,7 +38,7 @@ public class Register extends javax.swing.JFrame {
     // 2. Setup Placeholders
     setupField(username, "Shinobi Name: (Username)");
     setupField(clan, "Clan Lineage:");
-    setupField(Rank, "Rank");
+    setupField(Rank, "Rank:");
     setupField(Origin, "Village Origin");
     setupField(password, "Chakra Key: (Password)");
     setupField(confirmpass, "Confirm Password:");
