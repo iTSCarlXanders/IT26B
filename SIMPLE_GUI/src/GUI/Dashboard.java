@@ -117,7 +117,7 @@ public class Dashboard extends javax.swing.JFrame {
         sort.setBackground(new Color(44, 44, 46));
         sort.setForeground(Color.WHITE);
         
-        JButton[] btns = {undo, create, read, delete, Logout};
+        JButton[] btns = {update, create, read, delete, Logout};
         for (JButton b : btns) {
             b.setOpaque(false);
             b.setContentAreaFilled(false);
@@ -132,7 +132,7 @@ public class Dashboard extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         sort = new javax.swing.JComboBox<>();
-        undo = new javax.swing.JButton();
+        update = new javax.swing.JButton();
         create = new javax.swing.JButton();
         read = new javax.swing.JButton();
         delete = new javax.swing.JButton();
@@ -153,14 +153,14 @@ public class Dashboard extends javax.swing.JFrame {
         sort.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Name", "Chakra Power", "Mastery", "Origin" }));
         jPanel2.add(sort, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 110, 90, 20));
 
-        undo.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
-        undo.setText("UNDO");
-        undo.addActionListener(new java.awt.event.ActionListener() {
+        update.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
+        update.setText("UPDATE");
+        update.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                undoActionPerformed(evt);
+                updateActionPerformed(evt);
             }
         });
-        jPanel2.add(undo, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 270, 80, 40));
+        jPanel2.add(update, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 270, 100, 40));
 
         create.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
         create.setText("CREATE");
@@ -244,14 +244,42 @@ public class Dashboard extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void undoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_undoActionPerformed
-      if (!undoStack.isEmpty()) {
-            players.add(undoStack.remove(undoStack.size() - 1));
-            applySort(); 
-        } else {
-            JOptionPane.showMessageDialog(this, "Nothing to undo!");
-        }                       
-    }//GEN-LAST:event_undoActionPerformed
+    private void updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateActionPerformed
+    int row = jTable1.getSelectedRow();
+    
+    if (row != -1) {
+        // 1. Get current data from the table (handling filtered/sorted views)
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        String currentName = (String) model.getValueAt(row, 0);
+        
+        // 2. Find the actual object in your 'players' ArrayList
+        for (String[] p : players) {
+            if (p[0].equals(currentName)) {
+                
+                // 3. Ask user for new details (Pre-filled with current values)
+                String newName = JOptionPane.showInputDialog(this, "Update Name:", p[0]);
+                if (newName == null || newName.trim().isEmpty()) return; // Cancel if empty
+
+                String newChakra = JOptionPane.showInputDialog(this, "Update Chakra Power:", p[1]);
+                String newMastery = JOptionPane.showInputDialog(this, "Update Mastery:", p[2]);
+                String newVillage = JOptionPane.showInputDialog(this, "Update Village:", p[3]);
+
+                // 4. Apply changes to the ArrayList
+                p[0] = newName;
+                p[1] = newChakra;
+                p[2] = newMastery;
+                p[3] = newVillage;
+
+                // 5. Refresh visuals
+                applySort(); 
+                JOptionPane.showMessageDialog(this, "Shinobi Intel Updated!");
+                break;
+            }
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "Please select a Shinobi from the table to update.");
+    }                
+    }//GEN-LAST:event_updateActionPerformed
 
     private void readActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readActionPerformed
         int row = jTable1.getSelectedRow();
@@ -324,6 +352,6 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JButton read;
     private javax.swing.JTextField search;
     private javax.swing.JComboBox<String> sort;
-    private javax.swing.JButton undo;
+    private javax.swing.JButton update;
     // End of variables declaration//GEN-END:variables
 }

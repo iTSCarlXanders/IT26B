@@ -40,7 +40,7 @@ public class Register extends javax.swing.JFrame {
     setupField(clan, "Clan Lineage:");
     setupField(email, "Communication Toad: (Email)");
     setupField(Origin, "Village Origin");
-    setupField(password, "Forbidden Seal: (Password)");
+    setupField(password, "Chakra Key: (Password)");
     setupField(confirmpass, "Confirm Password:");
 
     // 3. THE PERFECT FIX FOR ABSOLUTE LAYOUT:

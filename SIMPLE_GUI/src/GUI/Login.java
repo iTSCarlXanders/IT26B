@@ -44,12 +44,12 @@ public class Login extends javax.swing.JFrame {
 
     private void setupPlaceholders() {
         // --- Username Logic ---
-        Username.setText("Clan ID");
+        Username.setText("Username");
         Username.setForeground(Color.GRAY);
         Username.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
-                if (Username.getText().equals("Clan ID")) {
+                if (Username.getText().equals("Username")) {
                     Username.setText("");
                     Username.setForeground(Color.BLACK);
                 }
@@ -57,7 +57,7 @@ public class Login extends javax.swing.JFrame {
             @Override
             public void focusLost(FocusEvent e) {
                 if (Username.getText().isEmpty()) {
-                    Username.setText("Clan ID");
+                    Username.setText("Username");
                     Username.setForeground(Color.GRAY);
                 }
             }
