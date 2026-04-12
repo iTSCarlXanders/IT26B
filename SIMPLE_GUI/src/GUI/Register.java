@@ -53,7 +53,7 @@ public class Register extends javax.swing.JFrame {
 
     private void setupField(JTextField field, String hint) {
         field.setText(hint);
-        field.setForeground(new java.awt.Color(153, 153, 153)); 
+        field.setForeground(new Color(15, 20, 30));
         
         if (field instanceof JPasswordField jPasswordField) {
             jPasswordField.setEchoChar((char) 0);
