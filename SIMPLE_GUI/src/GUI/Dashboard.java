@@ -5,48 +5,66 @@
 package GUI;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author user
  */
 public class Dashboard extends javax.swing.JFrame {
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Dashboard.class.getName());
 
-    /**
-     * Creates new form Dashboard
-     */
+    private ArrayList<String[]> players = new ArrayList<>();
+    private ArrayList<String[]> undoStack = new ArrayList<>();
+
     public Dashboard() {
         initComponents();
         stylizeInterface();
-        this.setLocationRelativeTo(null); // Centers the dashboard on screen
+        this.setLocationRelativeTo(null);
+        
+        loadInitialData(); 
+        refreshTable();
     }
-    private void stylizeInterface() {
-        // 1. Make the main content panel transparent
-        jPanel2.setOpaque(false);
-        jPanel2.setBackground(new Color(0, 0, 0, 0));
 
-        // 2. Make the Table and ScrollPane transparent
+    private void loadInitialData() {
+        players.add(new String[]{"Naruto Uzumaki", "5000", "Rasengan", "Konoha"});
+        players.add(new String[]{"Sasuke Uchiha", "4500", "Chidori", "Konoha"});
+        players.add(new String[]{"Kakashi Hatake", "3500", "Kamui", "Konoha"});
+    }
+
+    private void refreshTable() {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0); 
+        for (String[] p : players) {
+            model.addRow(p);
+        }
+    }
+
+    // --- SORTING LOGIC ---
+    private void bubbleSortByName() {
+        for (int i = 0; i < players.size() - 1; i++) {
+            for (int j = 0; j < players.size() - i - 1; j++) {
+                if (players.get(j)[0].compareToIgnoreCase(players.get(j + 1)[0]) > 0) {
+                    String[] temp = players.get(j);
+                    players.set(j, players.get(j + 1));
+                    players.set(j + 1, temp);
+                }
+            }
+        }
+    }
+
+    private void stylizeInterface() {
+        jPanel2.setOpaque(false);
         jScrollPane1.setOpaque(false);
         jScrollPane1.getViewport().setOpaque(false);
-        jScrollPane1.setBorder(null);
-        
         jTable1.setOpaque(false);
-        ((javax.swing.table.DefaultTableCellRenderer)jTable1.getDefaultRenderer(Object.class)).setOpaque(false);
-        jTable1.setShowGrid(false);
-        jTable1.setGridColor(new Color(0,0,0,0));
         
-        // 3. Make all buttons transparent
-        JButton[] buttons = {jButton1, jButton2, jButton3, jButton4, jButton5};
-        for (JButton btn : buttons) {
-            btn.setOpaque(false);
-            btn.setContentAreaFilled(false);
-            btn.setBorderPainted(false);
-            btn.setFocusPainted(false);
-            btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-            // Set a soft ink-black color for the text
-            btn.setForeground(new Color(15, 20, 30)); 
+        JButton[] btns = {undo, create, read, delete, Logout};
+        for (JButton b : btns) {
+            b.setOpaque(false);
+            b.setContentAreaFilled(false);
+            b.setBorderPainted(false);
         }
     }
     @SuppressWarnings("unchecked")
@@ -56,11 +74,11 @@ public class Dashboard extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jComboBox1 = new javax.swing.JComboBox<>();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        undo = new javax.swing.JButton();
+        create = new javax.swing.JButton();
+        read = new javax.swing.JButton();
+        delete = new javax.swing.JButton();
+        Logout = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
@@ -73,48 +91,53 @@ public class Dashboard extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(44, 44, 46, 180));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jPanel2.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 110, 90, -1));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Name", "Chakra Power", "Mastery", "Origin" }));
+        jPanel2.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 110, 90, 20));
 
-        jButton1.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
-        jButton1.setText("UNDO");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        undo.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
+        undo.setText("UNDO");
+        undo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                undoActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 270, 80, 40));
+        jPanel2.add(undo, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 270, 80, 40));
 
-        jButton2.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
-        jButton2.setText("CREATE");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        create.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
+        create.setText("CREATE");
+        create.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                createActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 143, -1, 40));
+        jPanel2.add(create, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 143, -1, 40));
 
-        jButton3.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
-        jButton3.setText("READ");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        read.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
+        read.setText("READ");
+        read.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                readActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(132, 203, 80, 50));
+        jPanel2.add(read, new org.netbeans.lib.awtextra.AbsoluteConstraints(132, 203, 80, 50));
 
-        jButton4.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
-        jButton4.setText("DELETE");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        delete.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
+        delete.setText("DELETE");
+        delete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                deleteActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 330, 90, 50));
+        jPanel2.add(delete, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 330, 100, 50));
 
-        jButton5.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
-        jButton5.setText("LOG OUT");
-        jPanel2.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 400, -1, 40));
+        Logout.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
+        Logout.setText("LOG OUT");
+        Logout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LogoutActionPerformed(evt);
+            }
+        });
+        jPanel2.add(Logout, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 400, 110, 40));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -124,7 +147,7 @@ public class Dashboard extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "Name", "Chakra", "Jutsu Mastery", "Village(Affiliation)"
+                "Name", "Chakra Power", "Jutsu Mastery", "Village(Affiliation)"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -155,53 +178,75 @@ public class Dashboard extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+    private void undoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_undoActionPerformed
+        if (!undoStack.isEmpty()) {
+            players.add(undoStack.remove(undoStack.size() - 1));
+            refreshTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "Nothing to undo!");
         }
-        //</editor-fold>
+    }//GEN-LAST:event_undoActionPerformed
 
-        /* Create and display the form */
+    private void readActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readActionPerformed
+       int row = jTable1.getSelectedRow();
+        if (row != -1) {
+            String[] p = players.get(row);
+            String info = "Name: " + p[0] + "\nChakra: " + p[1] + "\nMastery: " + p[2] + "\nVillage: " + p[3];
+            JOptionPane.showMessageDialog(this, info, "Shinobi Intel", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Select a Shinobi first.");
+        }
+    }//GEN-LAST:event_readActionPerformed
+
+    private void createActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createActionPerformed
+        String name = JOptionPane.showInputDialog(this, "Enter Shinobi Name:");
+        if (name != null && !name.trim().isEmpty()) {
+            String chakra = JOptionPane.showInputDialog(this, "Chakra Level:");
+            String mastery = JOptionPane.showInputDialog(this, "Jutsu Mastery:");
+            String village = JOptionPane.showInputDialog(this, "Village:");
+            
+            players.add(new String[]{name, chakra, mastery, village});
+            refreshTable();
+        }
+    }//GEN-LAST:event_createActionPerformed
+
+    private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
+       int row = jTable1.getSelectedRow();
+        if (row != -1) {
+            undoStack.add(players.get(row)); 
+            players.remove(row);
+            refreshTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "Select an entry to delete.");
+        }
+    }//GEN-LAST:event_deleteActionPerformed
+
+    private void LogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogoutActionPerformed
+    int confirm = javax.swing.JOptionPane.showConfirmDialog(
+        this, 
+        "Are you sure you want to log out, Shinobi?", 
+        "Confirm Logout", 
+        javax.swing.JOptionPane.YES_NO_OPTION
+    );
+
+    // 2. If they click "YES"
+    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+        // Open the Login Frame
+        // Note: Make sure 'LoginFrame' is the actual name of your login class!
+        new LoginFrame().setVisible(true); 
+        
+        // 3. Close (dispose) the current Dashboard
+        this.dispose(); 
+    }
+    }//GEN-LAST:event_LogoutActionPerformed
+
+    public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(() -> new Dashboard().setVisible(true));
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JButton Logout;
+    private javax.swing.JButton create;
+    private javax.swing.JButton delete;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -209,5 +254,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JButton read;
+    private javax.swing.JButton undo;
     // End of variables declaration//GEN-END:variables
 }

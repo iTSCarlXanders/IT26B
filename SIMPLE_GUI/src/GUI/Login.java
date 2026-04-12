@@ -7,25 +7,26 @@ package GUI;
     import java.awt.Color;
     import java.awt.event.FocusEvent;
     import java.awt.event.FocusListener;
+    import javax.swing.JOptionPane;
+    import javax.swing.UnsupportedLookAndFeelException;
 
 public class Login extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Login.class.getName());
-    
+
     public Login() {
         initComponents();
         this.setLocationRelativeTo(null);
 
-        // 1. Setup Placeholders for Clan ID and Chakra Key
+        // 1. Setup Placeholders for Username and Password
         setupPlaceholders();
 
         // 2. Style buttons to be transparent "Ink" text
         styleTransparentButton(jButton2);
-        
+
         // 3. Fix the Layering (Z-Order)
-        // This keeps the scroll (jLabel8) in the background
         if (jPanel3.getComponentCount() > 0) {
-             jPanel3.setComponentZOrder(jLabel8, jPanel3.getComponentCount() - 1);
+            jPanel3.setComponentZOrder(jLabel8, jPanel3.getComponentCount() - 1);
         }
 
         jPanel3.revalidate();
@@ -38,66 +39,67 @@ public class Login extends javax.swing.JFrame {
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
         btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btn.setForeground(new java.awt.Color(84, 46, 20)); // Deep brown "Ink"
+        btn.setForeground(new java.awt.Color(84, 46, 20)); 
     }
-    
-        private void setupPlaceholders() {
-        // --- Clan ID Logic ---
-        jTextField1.setText("Clan ID");
-        jTextField1.setForeground(Color.GRAY);
-        jTextField1.addFocusListener(new FocusListener() {
+
+    private void setupPlaceholders() {
+        // --- Username Logic ---
+        Username.setText("Clan ID");
+        Username.setForeground(Color.GRAY);
+        Username.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
-                if (jTextField1.getText().equals("Clan ID")) {
-                    jTextField1.setText("");
-                    jTextField1.setForeground(Color.BLACK);
+                if (Username.getText().equals("Clan ID")) {
+                    Username.setText("");
+                    Username.setForeground(Color.BLACK);
                 }
             }
             @Override
             public void focusLost(FocusEvent e) {
-                if (jTextField1.getText().isEmpty()) {
-                    jTextField1.setText("Clan ID");
-                    jTextField1.setForeground(Color.GRAY);
+                if (Username.getText().isEmpty()) {
+                    Username.setText("Clan ID");
+                    Username.setForeground(Color.GRAY);
                 }
             }
         });
-        
-    // --- Chakra Key Logic ---
-        jPasswordField1.setEchoChar((char) 0); // Show text initially
-        jPasswordField1.setText("Chakra Key");
-        jPasswordField1.setForeground(Color.GRAY);
-        jPasswordField1.addFocusListener(new FocusListener() {
+
+        // --- Password Logic ---
+        password.setEchoChar((char) 0); 
+        password.setText("Chakra Key");
+        password.setForeground(Color.GRAY);
+        password.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
-                String pass = new String(jPasswordField1.getPassword());
+                String pass = new String(password.getPassword());
                 if (pass.equals("Chakra Key")) {
-                    jPasswordField1.setText("");
-                    jPasswordField1.setForeground(Color.BLACK);
-                    if (!jCheckBox2.isSelected()) jPasswordField1.setEchoChar('•');
+                    password.setText("");
+                    password.setForeground(Color.BLACK);
+                    if (!showpass.isSelected()) {
+                        password.setEchoChar('•');
+                    }
                 }
             }
             @Override
             public void focusLost(FocusEvent e) {
-                String pass = new String(jPasswordField1.getPassword());
+                String pass = new String(password.getPassword());
                 if (pass.isEmpty()) {
-                    jPasswordField1.setText("Chakra Key");
-                    jPasswordField1.setForeground(Color.GRAY);
-                    jPasswordField1.setEchoChar((char) 0);
+                    password.setText("Chakra Key");
+                    password.setForeground(Color.GRAY);
+                    password.setEchoChar((char) 0);
                 }
             }
         });
     }
 
     private void togglePassword() {
-        String pass = new String(jPasswordField1.getPassword());
-        if (jCheckBox2.isSelected()) {
-            jPasswordField1.setEchoChar((char) 0); 
+        String pass = new String(password.getPassword());
+        if (showpass.isSelected()) {
+            password.setEchoChar((char) 0);
         } else {
-            // Mask only if it's NOT the placeholder
             if (!pass.equals("Chakra Key") && !pass.isEmpty()) {
-                jPasswordField1.setEchoChar('•');
+                password.setEchoChar('•');
             } else {
-                jPasswordField1.setEchoChar((char) 0);
+                password.setEchoChar((char) 0);
             }
         }
     }
@@ -107,12 +109,12 @@ public class Login extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jCheckBox2 = new javax.swing.JCheckBox();
+        showpass = new javax.swing.JCheckBox();
         jPanel3 = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
-        jPasswordField1 = new javax.swing.JPasswordField();
+        Username = new javax.swing.JTextField();
+        password = new javax.swing.JPasswordField();
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        accessportal = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
@@ -125,42 +127,42 @@ public class Login extends javax.swing.JFrame {
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+        showpass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox2ActionPerformed(evt);
+                showpassActionPerformed(evt);
             }
         });
-        jPanel1.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 330, -1, 20));
+        jPanel1.add(showpass, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 330, -1, 20));
 
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jTextField1.setFont(new java.awt.Font("Segoe Script", 0, 12)); // NOI18N
-        jTextField1.setText("Clan ID");
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        Username.setFont(new java.awt.Font("Segoe Script", 0, 12)); // NOI18N
+        Username.setText("Username");
+        Username.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                UsernameActionPerformed(evt);
             }
         });
-        jPanel3.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 200, 36));
+        jPanel3.add(Username, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 200, 36));
 
-        jPasswordField1.setFont(new java.awt.Font("Segoe Script", 0, 12)); // NOI18N
-        jPasswordField1.setText("jPasswordField1");
-        jPanel3.add(jPasswordField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 112, 200, 30));
+        password.setFont(new java.awt.Font("Segoe Script", 0, 12)); // NOI18N
+        password.setText("jPasswordField1");
+        jPanel3.add(password, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 112, 200, 30));
 
         jLabel1.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
         jLabel1.setText("LOG IN");
         jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 20, 56, 36));
 
-        jButton1.setBackground(new java.awt.Color(153, 0, 0));
-        jButton1.setFont(new java.awt.Font("Segoe Script", 1, 14)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setLabel("ACCESS PORTAL");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        accessportal.setBackground(new java.awt.Color(153, 0, 0));
+        accessportal.setFont(new java.awt.Font("Segoe Script", 1, 14)); // NOI18N
+        accessportal.setForeground(new java.awt.Color(255, 255, 255));
+        accessportal.setLabel("ACCESS PORTAL");
+        accessportal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                accessportalActionPerformed(evt);
             }
         });
-        jPanel3.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 200, 35));
+        jPanel3.add(accessportal, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 200, 35));
 
         jButton2.setFont(new java.awt.Font("Segoe Script", 0, 12)); // NOI18N
         jButton2.setText("Not Registered?");
@@ -214,33 +216,39 @@ public class Login extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       String user = jTextField1.getText();
-        String pass = new String(jPasswordField1.getPassword());
-        if (user.equals("Admin") && pass.equals("1234")) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Success!");
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Invalid!");
+    private void accessportalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accessportalActionPerformed
+       String user = Username.getText().trim();
+        String pass = new String(password.getPassword());
+
+        // Basic validation to check if placeholders are still there
+        if (user.equals("Clan ID") || pass.equals("Chakra Key") || user.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter your credentials.", "Portal Denied", JOptionPane.WARNING_MESSAGE);
+            return;
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // Authentication Check
+        if (user.equals("Admin") && pass.equals("1234")) {
+            JOptionPane.showMessageDialog(this, "Access Granted, Shinobi!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            
+            // Open Dashboard and Close Login
+            new Dashboard().setVisible(true);
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid Clan ID or Chakra Key!", "Access Denied", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_accessportalActionPerformed
+
+    private void UsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UsernameActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_UsernameActionPerformed
 
-    private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+    private void showpassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showpassActionPerformed
        togglePassword();
-    }//GEN-LAST:event_jCheckBox2ActionPerformed
+    }//GEN-LAST:event_showpassActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // 1. Create an instance of your Register frame
-    Register registerPage = new Register(); 
-    
-    // 2. Make the Register window appear
-    registerPage.setVisible(true);
-    
-    // 3. Close the current Login window
-    this.dispose();
+       new Register().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     public static void main(String args[]) {
@@ -251,16 +259,16 @@ public class Login extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (Exception ex) {
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ex) {
             logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
         java.awt.EventQueue.invokeLater(() -> new Login().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JTextField Username;
+    private javax.swing.JButton accessportal;
     private javax.swing.JButton jButton2;
-    private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -270,7 +278,7 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPasswordField jPasswordField1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JPasswordField password;
+    private javax.swing.JCheckBox showpass;
     // End of variables declaration//GEN-END:variables
 }
