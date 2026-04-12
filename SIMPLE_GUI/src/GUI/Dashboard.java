@@ -47,21 +47,30 @@ public class Dashboard extends javax.swing.JFrame {
         refreshTable();
     }
 
-    private void loadInitialData() {
+   private void loadInitialData() {
         String village = "Unknown Village"; 
+        String rank = "Genin"; // Default rank
+        
         try (BufferedReader br = new BufferedReader(new FileReader("registry.txt"))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] details = line.split(",");
-                if (details.length >= 3 && details[0].equalsIgnoreCase(loggedInUser)) {
+                // Expected format: Username, Password, Village, Rank
+                if (details.length >= 4 && details[0].equalsIgnoreCase(loggedInUser)) {
                     village = details[2];
+                    rank = details[3];
                     break;
+                } else if (details.length == 3 && details[0].equalsIgnoreCase(loggedInUser)) {
+                    // Fallback for older 3-column records
+                    village = details[2];
                 }
             }
         } catch (IOException e) {
             System.out.println("Error reading registry: " + e.getMessage());
         }
-        players.add(new String[]{loggedInUser, "1000", "Genin", village});
+        
+        // Add the logged-in user as the first entry in the dashboard
+        players.add(new String[]{loggedInUser, "1000", rank, village});
     }
 
     private void refreshTable() {
@@ -81,7 +90,12 @@ public class Dashboard extends javax.swing.JFrame {
         ArrayList<String[]> filteredList = new ArrayList<>();
         
         for (String[] p : players) {
-            if (p[0].toLowerCase().contains(query) || p[3].toLowerCase().contains(query)) {
+            // Checks Name [0], Chakra [1], Rank [2], and Village/Origin [3]
+            if (p[0].toLowerCase().contains(query) || 
+                p[1].toLowerCase().contains(query) || 
+                p[2].toLowerCase().contains(query) || 
+                p[3].toLowerCase().contains(query)) {
+                
                 filteredList.add(p);
             }
         }
@@ -206,7 +220,7 @@ public class Dashboard extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "Name", "Chakra Power", "Jutsu Mastery", "Village(Affiliation)"
+                "Name", "Chakra Power", "Rank", "Village(Affiliation)"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -261,7 +275,7 @@ public class Dashboard extends javax.swing.JFrame {
                 if (newName == null || newName.trim().isEmpty()) return; // Cancel if empty
 
                 String newChakra = JOptionPane.showInputDialog(this, "Update Chakra Power:", p[1]);
-                String newMastery = JOptionPane.showInputDialog(this, "Update Mastery:", p[2]);
+                String newMastery = JOptionPane.showInputDialog(this, "Update Rank:", p[2]);
                 String newVillage = JOptionPane.showInputDialog(this, "Update Village:", p[3]);
 
                 // 4. Apply changes to the ArrayList
@@ -282,24 +296,79 @@ public class Dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_updateActionPerformed
 
     private void readActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readActionPerformed
+                                    
+                                     
+    // Unicode escapes for compatibility: 
+    // \uD83E\uDD77 = Ninja, \uD83D\uDCDC = Scroll, \uD83D\uDEE1 = Shield
+    String[] options = {"Read Selected \uD83E\uDD77", "Read All Codex \uD83D\uDCDC", "Cancel"};
+    
+    int choice = JOptionPane.showOptionDialog(this, 
+        "Decrypting the Midnight Archives... \nSelect information depth:", 
+        "Shinobi Intelligence Access", 
+        JOptionPane.DEFAULT_OPTION, 
+        JOptionPane.QUESTION_MESSAGE, 
+        null, options, options[0]);
+
+    if (choice == 0) { // --- READ SELECTED TARGET ---
         int row = jTable1.getSelectedRow();
         if (row != -1) {
             DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            String info = "Name: " + model.getValueAt(row, 0) + 
-                          "\nChakra: " + model.getValueAt(row, 1) + 
-                          "\nMastery: " + model.getValueAt(row, 2) + 
-                          "\nVillage: " + model.getValueAt(row, 3);
-            JOptionPane.showMessageDialog(this, info, "Shinobi Intel", JOptionPane.INFORMATION_MESSAGE);
+            
+            String intel = " \uD83D\uDEE1  TARGET CLASSIFIED DATA \n" +
+                           "==========================\n" +
+                           " NAME    : " + model.getValueAt(row, 0) + "\n" +
+                           " CHAKRA  : " + model.getValueAt(row, 1) + "\n" +
+                           " RANK : " + model.getValueAt(row, 2) + "\n" +
+                           " VILLAGE : " + model.getValueAt(row, 3) + "\n" +
+                           "==========================";
+            
+            JOptionPane.showMessageDialog(this, intel, "Target Decrypted", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(this, "Select a Shinobi first.");
+            JOptionPane.showMessageDialog(this, "No target identified in the shadows! \u26A0\uFE0F");
         }
+        
+    } else if (choice == 1) { // --- READ ALL ENTRIES ---
+        if (players.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "The archives are empty. No Shinobi found.");
+            return;
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append(" \uD83D\uDCDC GLOBAL SHINOBI CODEX SUMMARY \n");
+        sb.append("====================================\n\n");
+        
+        for (int i = 0; i < players.size(); i++) {
+            String[] p = players.get(i);
+            sb.append(" SHINOBI UNIT #").append(i + 1).append("\n");
+            sb.append(" [NAME]      : ").append(p[0]).append("\n");
+            sb.append(" [POWER]   : ").append(p[1]).append("\n");
+            sb.append(" [RANK]    : ").append(p[2]).append("\n");
+            sb.append(" [ORIGIN]  : ").append(p[3]).append("\n");
+            sb.append("------------------------------------\n"); // "Next" separator
+        }
+        
+        sb.append("\n TOTAL ACTIVE SHINOBI: ").append(players.size());
+        
+        // JTextArea ensures the alignment looks professional in the popup
+        javax.swing.JTextArea textArea = new javax.swing.JTextArea(sb.toString());
+        textArea.setEditable(false);
+        textArea.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 12));
+        textArea.setBackground(new java.awt.Color(240, 240, 240));
+        
+        javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(textArea);
+        scrollPane.setPreferredSize(new java.awt.Dimension(380, 400));
+        
+        JOptionPane.showMessageDialog(this, scrollPane, "Full Intel Report", JOptionPane.PLAIN_MESSAGE);
+    }
+
+
     }//GEN-LAST:event_readActionPerformed
 
     private void createActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createActionPerformed
        String name = JOptionPane.showInputDialog(this, "Enter Shinobi Name:");
         if (name != null && !name.trim().isEmpty()) {
             String chakra = JOptionPane.showInputDialog(this, "Chakra Level:");
-            String mastery = JOptionPane.showInputDialog(this, "Jutsu Mastery:");
+            String mastery = JOptionPane.showInputDialog(this, "Rank:");
             String village = JOptionPane.showInputDialog(this, "Village:");
             
             players.add(new String[]{name, chakra, mastery, village});

@@ -38,7 +38,7 @@ public class Register extends javax.swing.JFrame {
     // 2. Setup Placeholders
     setupField(username, "Shinobi Name: (Username)");
     setupField(clan, "Clan Lineage:");
-    setupField(email, "Communication Toad: (Email)");
+    setupField(Rank, "Rank");
     setupField(Origin, "Village Origin");
     setupField(password, "Chakra Key: (Password)");
     setupField(confirmpass, "Confirm Password:");
@@ -124,7 +124,7 @@ public class Register extends javax.swing.JFrame {
         jCheckBox2 = new javax.swing.JCheckBox();
         username = new javax.swing.JTextField();
         clan = new javax.swing.JTextField();
-        email = new javax.swing.JTextField();
+        Rank = new javax.swing.JTextField();
         Origin = new javax.swing.JTextField();
         signup = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
@@ -177,15 +177,15 @@ public class Register extends javax.swing.JFrame {
         });
         jPanel2.add(clan, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 220, 198, 34));
 
-        email.setBackground(new java.awt.Color(204, 204, 204));
-        email.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
-        email.setText("Email: ");
-        email.addActionListener(new java.awt.event.ActionListener() {
+        Rank.setBackground(new java.awt.Color(204, 204, 204));
+        Rank.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
+        Rank.setText("Rank:");
+        Rank.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                emailActionPerformed(evt);
+                RankActionPerformed(evt);
             }
         });
-        jPanel2.add(email, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 170, 200, 34));
+        jPanel2.add(Rank, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 170, 200, 34));
 
         Origin.setBackground(new java.awt.Color(204, 204, 204));
         Origin.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
@@ -286,9 +286,9 @@ public class Register extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_usernameActionPerformed
 
-    private void emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emailActionPerformed
+    private void RankActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RankActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_emailActionPerformed
+    }//GEN-LAST:event_RankActionPerformed
 
     private void OriginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OriginActionPerformed
         // TODO add your handling code here:
@@ -296,38 +296,39 @@ public class Register extends javax.swing.JFrame {
 
     private void signupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signupActionPerformed
         String user = username.getText().trim();
-        String clanLineage = clan.getText().trim();
-        String mail = email.getText().trim();
-        String village = Origin.getText().trim();
-        String pass1 = new String(password.getPassword());
-        String pass2 = new String(confirmpass.getPassword());
+    String clanLineage = clan.getText().trim();
+    String rankLevel = Rank.getText().trim(); 
+    String village = Origin.getText().trim();
+    String pass1 = new String(password.getPassword());
+    String pass2 = new String(confirmpass.getPassword());
 
-        // Validation
-        if (user.isEmpty() || user.equals("Shinobi Name: (Username)") ||
-            clanLineage.isEmpty() || clanLineage.equals("Clan Lineage:") ||
-            mail.isEmpty() || mail.equals("Communication Toad: (Email)") ||
-            village.isEmpty() || village.equals("Village Origin") ||
-            pass1.isEmpty() || pass1.equals("Forbidden Seal: (Password)") ||
-            pass2.isEmpty() || pass2.equals("Confirm Password:")) {
-            
-            JOptionPane.showMessageDialog(this, "All scrolls must be filled!", "Incomplete Jutsu", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+    // Validation
+    if (user.isEmpty() || user.equals("Shinobi Name: (Username)") ||
+        clanLineage.isEmpty() || clanLineage.equals("Clan Lineage:") ||
+        rankLevel.isEmpty() || rankLevel.equals("Rank:") || // Check for Rank placeholder
+        village.isEmpty() || village.equals("Village Origin") ||
+        pass1.isEmpty() || pass2.isEmpty()) {
+        
+        JOptionPane.showMessageDialog(this, "All scrolls must be filled! \u26A0\uFE0F", "Incomplete Jutsu", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
 
-        if (!pass1.equals(pass2)) {
-            JOptionPane.showMessageDialog(this, "The Forbidden Seals do not match!", "Chakra Mismatch", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+    if (!pass1.equals(pass2)) {
+        JOptionPane.showMessageDialog(this, "The Forbidden Seals do not match! \u274C", "Chakra Mismatch", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
-        // Saving Data
-        try (FileWriter writer = new FileWriter("registry.txt", true)) {
-            writer.write(user + "," + pass1 + "," + village + "\n");
-            JOptionPane.showMessageDialog(this, "Enrollment Successful!\nYou may now enter the portal.");
-            new Login().setVisible(true);
-            this.dispose();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "The Village Scroll is locked. Error saving data.");
-        }
+    // Saving Data: Adding rankLevel to the comma-separated line
+    try (FileWriter writer = new FileWriter("registry.txt", true)) {
+        // Saved Format: Username,Password,Village,Rank
+        writer.write(user + "," + pass1 + "," + village + "," + rankLevel + "\n");
+        
+        JOptionPane.showMessageDialog(this, "Enrollment Successful! \uD83E\uDD77\nYour rank is recorded in the Great Scroll.");
+        new Login().setVisible(true);
+        this.dispose();
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(this, "The Village Scroll is locked. Error saving data.");
+    }
     }//GEN-LAST:event_signupActionPerformed
 
     private void passwordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordActionPerformed
@@ -373,10 +374,10 @@ public class Register extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField Origin;
+    private javax.swing.JTextField Rank;
     private javax.swing.JButton back;
     private javax.swing.JTextField clan;
     private javax.swing.JPasswordField confirmpass;
-    private javax.swing.JTextField email;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;
