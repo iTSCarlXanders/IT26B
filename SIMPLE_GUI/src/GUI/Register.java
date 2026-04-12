@@ -44,8 +44,7 @@ public class Register extends javax.swing.JFrame {
     jPanel2.setComponentZOrder(jCheckBox1, 0);
     jPanel2.setComponentZOrder(jCheckBox2, 0);
     
-    // Force the scroll background (jLabel2) to the very back
-    jPanel2.setComponentZOrder(jLabel2, jPanel2.getComponentCount() - 1);
+    
 
     // Refresh layout
     jPanel2.revalidate();
@@ -127,7 +126,7 @@ public class Register extends javax.swing.JFrame {
         jPasswordField1 = new javax.swing.JPasswordField();
         jPasswordField2 = new javax.swing.JPasswordField();
         jButton2 = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
@@ -153,6 +152,7 @@ public class Register extends javax.swing.JFrame {
         jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 380, -1, -1));
         jCheckBox2.getAccessibleContext().setAccessibleParent(jCheckBox1);
 
+        jTextField1.setBackground(new java.awt.Color(204, 204, 204));
         jTextField1.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
         jTextField1.setText("Shinobi Name: (Username)");
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
@@ -162,6 +162,7 @@ public class Register extends javax.swing.JFrame {
         });
         jPanel2.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 170, 198, 34));
 
+        jTextField2.setBackground(new java.awt.Color(204, 204, 204));
         jTextField2.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
         jTextField2.setText("Clan Lineage:");
         jTextField2.addActionListener(new java.awt.event.ActionListener() {
@@ -171,6 +172,7 @@ public class Register extends javax.swing.JFrame {
         });
         jPanel2.add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 220, 198, 34));
 
+        jTextField3.setBackground(new java.awt.Color(204, 204, 204));
         jTextField3.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
         jTextField3.setText("Communication Toad: (Email) ");
         jTextField3.addActionListener(new java.awt.event.ActionListener() {
@@ -180,6 +182,7 @@ public class Register extends javax.swing.JFrame {
         });
         jPanel2.add(jTextField3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 120, -1, 34));
 
+        jTextField6.setBackground(new java.awt.Color(204, 204, 204));
         jTextField6.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
         jTextField6.setText("Elemental Affinity(Chakra)");
         jTextField6.addActionListener(new java.awt.event.ActionListener() {
@@ -189,7 +192,7 @@ public class Register extends javax.swing.JFrame {
         });
         jPanel2.add(jTextField6, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 270, 198, 37));
 
-        jButton1.setBackground(new java.awt.Color(51, 102, 0));
+        jButton1.setBackground(new java.awt.Color(51, 51, 51));
         jButton1.setFont(new java.awt.Font("Segoe Print", 1, 18)); // NOI18N
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Sign Up");
@@ -201,9 +204,11 @@ public class Register extends javax.swing.JFrame {
         jPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(138, 420, -1, -1));
 
         jLabel5.setFont(new java.awt.Font("Segoe Print", 1, 24)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(204, 204, 204));
         jLabel5.setText("Shinobi Enrollment");
         jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 250, -1));
 
+        jPasswordField1.setBackground(new java.awt.Color(204, 204, 204));
         jPasswordField1.setText("jPasswordField1");
         jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -212,10 +217,11 @@ public class Register extends javax.swing.JFrame {
         });
         jPanel2.add(jPasswordField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, 200, 30));
 
+        jPasswordField2.setBackground(new java.awt.Color(204, 204, 204));
         jPasswordField2.setText("jPasswordField2");
         jPanel2.add(jPasswordField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 370, 200, 30));
 
-        jButton2.setBackground(new java.awt.Color(153, 0, 0));
+        jButton2.setBackground(new java.awt.Color(51, 51, 51));
         jButton2.setFont(new java.awt.Font("Segoe Print", 1, 15)); // NOI18N
         jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setText("BACK");
@@ -226,12 +232,12 @@ public class Register extends javax.swing.JFrame {
         });
         jPanel2.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 420, 80, 40));
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/GUI/scroll s (8) (5).png"))); // NOI18N
-        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(-100, 0, 420, 510));
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/GUI/BSCROLL.png"))); // NOI18N
+        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(-100, 0, 420, 500));
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 10, 270, 500));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 20, 270, 500));
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/GUI/BG2.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/GUI/BG3.png"))); // NOI18N
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -20, 1010, 550));
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -332,7 +338,7 @@ public class Register extends javax.swing.JFrame {
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
