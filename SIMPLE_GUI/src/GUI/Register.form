@@ -54,17 +54,12 @@
           </Layout>
           <SubComponents>
             <Component class="javax.swing.JCheckBox" name="jCheckBox1">
-              <AccessibilityProperties>
-                <Property name="AccessibleContext.accessibleParent" type="javax.accessibility.Accessible" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="jCheckBox2"/>
-                </Property>
-              </AccessibilityProperties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jCheckBox1ActionPerformed"/>
               </Events>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                  <AbsoluteConstraints x="240" y="380" width="-1" height="-1"/>
+                  <AbsoluteConstraints x="240" y="330" width="-1" height="-1"/>
                 </Constraint>
               </Constraints>
             </Component>
@@ -79,7 +74,7 @@
               </Events>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                  <AbsoluteConstraints x="240" y="330" width="-1" height="-1"/>
+                  <AbsoluteConstraints x="240" y="380" width="-1" height="-1"/>
                 </Constraint>
               </Constraints>
             </Component>

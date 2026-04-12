@@ -21,33 +21,36 @@ public class Register extends javax.swing.JFrame {
     /**
      * Creates new form Register
      */
-    public Register() {
-        initComponents();
-        this.setLocationRelativeTo(null); 
+   public Register() {
+    initComponents();
+    this.setLocationRelativeTo(null); 
 
-        // 1. Initialize UI Elements for Checkboxes
-        jCheckBox1.setOpaque(false);
-        jCheckBox1.setText(""); 
-        jCheckBox2.setOpaque(false);
-        jCheckBox2.setText("");
+    // 1. Clean up Checkbox appearance
+    jCheckBox1.setOpaque(false);
+    jCheckBox1.setText(""); 
+    jCheckBox2.setOpaque(false);
+    jCheckBox2.setText("");
 
-        // 2. Setup Field Placeholders and Hints
-        setupField(jTextField1, "Shinobi Name: (Username)");
-        setupField(jTextField2, "Clan Lineage:");
-        setupField(jTextField3, "Communication Toad: (Email)");
-        setupField(jTextField6, "Elemental Affinity (Chakra)");
-        setupField(jPasswordField1, "Forbidden Seal: (Password)");
-        setupField(jPasswordField2, "Confirm Password:");
+    // 2. Setup Placeholders
+    setupField(jTextField1, "Shinobi Name: (Username)");
+    setupField(jTextField2, "Clan Lineage:");
+    setupField(jTextField3, "Communication Toad: (Email)");
+    setupField(jTextField6, "Elemental Affinity (Chakra)");
+    setupField(jPasswordField1, "Forbidden Seal: (Password)");
+    setupField(jPasswordField2, "Confirm Password:");
 
-        // 3. CRITICAL: Fix Layering (Must be at the very bottom of constructor)
-        // This ensures checkboxes are on top of the background image
-        jPanel2.setComponentZOrder(jCheckBox1, 0);
-        jPanel2.setComponentZOrder(jCheckBox2, 0);
-        jPanel2.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 330, -1, -1));
-        jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 380, -1, -1));
-        jPanel2.revalidate();
-        jPanel2.repaint();
-    }
+    // 3. THE PERFECT FIX FOR ABSOLUTE LAYOUT:
+    // Force checkboxes to the very front
+    jPanel2.setComponentZOrder(jCheckBox1, 0);
+    jPanel2.setComponentZOrder(jCheckBox2, 0);
+    
+    // Force the scroll background (jLabel2) to the very back
+    jPanel2.setComponentZOrder(jLabel2, jPanel2.getComponentCount() - 1);
+
+    // Refresh layout
+    jPanel2.revalidate();
+    jPanel2.repaint();
+}
 
     private void setupField(JTextField field, String hint) {
         field.setText(hint);
@@ -139,15 +142,14 @@ public class Register extends javax.swing.JFrame {
                 jCheckBox1ActionPerformed(evt);
             }
         });
-        jPanel2.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 380, -1, -1));
-        jCheckBox1.getAccessibleContext().setAccessibleParent(jCheckBox2);
+        jPanel2.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 330, -1, -1));
 
         jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBox2ActionPerformed(evt);
             }
         });
-        jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 330, -1, -1));
+        jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 380, -1, -1));
         jCheckBox2.getAccessibleContext().setAccessibleParent(jCheckBox1);
 
         jTextField1.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
