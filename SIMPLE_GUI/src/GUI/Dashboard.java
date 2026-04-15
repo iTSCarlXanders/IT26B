@@ -48,27 +48,26 @@ public class Dashboard extends javax.swing.JFrame {
     }
 
    private void loadInitialData() {
-        players.clear();
-        // SELECT ALL USERS so the dashboard shows the full directory
-        String sql = "SELECT username, village, rank FROM users";
+    players.clear();
+    // Update the SQL to select 'clan' instead of 'chakra_level'
+    String sql = "SELECT username, clan, rank, village FROM users";
+    
+    try (Connection conn = Database.getConnection();
+         PreparedStatement pst = conn.prepareStatement(sql);
+         ResultSet rs = pst.executeQuery()) {
         
-        try (Connection conn = Database.getConnection();
-             PreparedStatement pst = conn.prepareStatement(sql);
-             ResultSet rs = pst.executeQuery()) {
-            
-            while (rs.next()) {
-                // Formatting: Name, Placeholder Chakra (1000), Rank, Village
-                players.add(new String[]{
-                    rs.getString("username"), 
-                    "1000", 
-                    rs.getString("rank"), 
-                    rs.getString("village")
-                });
-            }
-        } catch (SQLException e) {
-            System.out.println("Database Load Error: " + e.getMessage());
+        while (rs.next()) {
+            players.add(new String[]{
+                rs.getString("username"), 
+                rs.getString("clan"),
+                rs.getString("rank"), 
+                rs.getString("village")
+            });
         }
+    } catch (SQLException e) {
+        System.out.println("Database Load Error: " + e.getMessage());
     }
+}
 
     private void refreshTable() {
         updateTableContent(players);
@@ -151,7 +150,7 @@ public class Dashboard extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(44, 44, 46, 180));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        sort.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Name", "Chakra Power", "Mastery", "Origin" }));
+        sort.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Name", "Clan", "Rank", "Origin" }));
         jPanel2.add(sort, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 110, 90, 20));
 
         update.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
@@ -207,7 +206,7 @@ public class Dashboard extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "Name", "Chakra Power", "Rank", "Village(Affiliation)"
+                "Name", "Clan", "Rank", "Village(Affiliation)"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -341,28 +340,45 @@ public class Dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_readActionPerformed
 
     private void createActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createActionPerformed
-       String name = JOptionPane.showInputDialog(this, "Shinobi Name:");
-        if (name != null && !name.trim().isEmpty()) {
-            String pass = JOptionPane.showInputDialog(this, "Assign Password:");
-            String village = JOptionPane.showInputDialog(this, "Village:");
-            String rank = JOptionPane.showInputDialog(this, "Rank:");
+                                      
+    // Example: User enters "Naruto Uzumaki"
+    String fullName = JOptionPane.showInputDialog(this, "Enter Full Name (First Last):");
+    
+    if (fullName != null && !fullName.trim().isEmpty()) {
+        String pass = JOptionPane.showInputDialog(this, "Set Password:");
+        String village = JOptionPane.showInputDialog(this, "Village:");
+        String rank = JOptionPane.showInputDialog(this, "Rank:");
 
-            try (Connection conn = Database.getConnection()) {
-                String sql = "INSERT INTO users (username, password, village, rank) VALUES (?, ?, ?, ?)";
-                PreparedStatement pst = conn.prepareStatement(sql);
-                pst.setString(1, name);
-                pst.setString(2, pass);
-                pst.setString(3, village);
-                pst.setString(4, rank);
-                pst.executeUpdate();
-                
-                JOptionPane.showMessageDialog(this, "Shinobi recorded in Database!");
-                loadInitialData();
-                refreshTable();
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Creation Failed: " + e.getMessage());
-            }
+        // --- AUTOMATIC CLAN FROM LAST NAME LOGIC ---
+        String clanName = "Unknown";
+        String[] nameParts = fullName.trim().split("\\s+"); // Splits name by spaces
+        
+        if (nameParts.length > 1) {
+            // Takes the very last word as the Clan
+            clanName = nameParts[nameParts.length - 1]; 
+        } else {
+            // If they only enter one name, it uses the name itself as the clan
+            clanName = nameParts[0]; 
         }
+
+        try (Connection conn = Database.getConnection()) {
+            String sql = "INSERT INTO users (username, clan, village, rank, password) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, fullName);
+            pst.setString(2, clanName); // Automatically saved as the last name
+            pst.setString(3, village);
+            pst.setString(4, rank);
+            pst.setString(5, pass);
+            pst.executeUpdate();
+            
+            JOptionPane.showMessageDialog(this, "Shinobi Registered!\nName: " + fullName + "\nClan: " + clanName);
+            
+            loadInitialData();
+            refreshTable();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
+        }
+    }
     }//GEN-LAST:event_createActionPerformed
 
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed

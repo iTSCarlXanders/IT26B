@@ -303,6 +303,10 @@ public class Register extends javax.swing.JFrame {
             return;
         }
 
+        // --- NEW CLAN LOGIC: Extract from Last Name ---
+        String[] nameParts = user.split("\\s+");
+        String clanName = (nameParts.length > 1) ? nameParts[nameParts.length - 1] : user;
+
         // 2. Database Logic
         try (Connection conn = Database.getConnection()) {
             if (conn == null) {
@@ -319,17 +323,18 @@ public class Register extends javax.swing.JFrame {
                 return;
             }
 
-            // Insert new user
-            String sql = "INSERT INTO users (username, password, village, rank) VALUES (?, ?, ?, ?)";
+            // --- FIXED: Added 'clan' to the INSERT statement ---
+            String sql = "INSERT INTO users (username, password, village, rank, clan) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, user);
             pst.setString(2, pass1);
             pst.setString(3, village);
             pst.setString(4, rankLevel);
+            pst.setString(5, clanName); // This saves your last name as the Clan
 
             pst.executeUpdate();
             
-            JOptionPane.showMessageDialog(this, "Enrollment Successful! 🥷\nYour rank is recorded in the Great Scroll.");
+            JOptionPane.showMessageDialog(this, "Enrollment Successful! 🥷\nWelcome to the " + clanName + " Clan.");
             new Login().setVisible(true);
             this.dispose();
             
@@ -355,7 +360,7 @@ public class Register extends javax.swing.JFrame {
     new Login().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_backActionPerformed
-
+    
     
     public static void main(String args[]) {
         try {
