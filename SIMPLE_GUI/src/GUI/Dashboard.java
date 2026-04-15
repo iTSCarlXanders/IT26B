@@ -250,55 +250,56 @@ public class Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateActionPerformed
-    int row = jTable1.getSelectedRow();
-        if (row != -1) {
-            String currentName = (String) jTable1.getValueAt(row, 0);
-            String newVillage = JOptionPane.showInputDialog(this, "New Village:", jTable1.getValueAt(row, 3));
-            String newRank = JOptionPane.showInputDialog(this, "New Rank:", jTable1.getValueAt(row, 2));
+                                        int row = jTable1.getSelectedRow();
+    if (row != -1) {
+        String currentName = (String) jTable1.getValueAt(row, 0);
+        String newVillage = JOptionPane.showInputDialog(this, "Update Village Origin:", jTable1.getValueAt(row, 3));
+        String newRank = JOptionPane.showInputDialog(this, "Update Shinobi Rank:", jTable1.getValueAt(row, 2));
 
-            if (newVillage != null && newRank != null) {
-                try (Connection conn = Database.getConnection()) {
-                    String sql = "UPDATE users SET village = ?, rank = ? WHERE username = ?";
-                    PreparedStatement pst = conn.prepareStatement(sql);
-                    pst.setString(1, newVillage);
-                    pst.setString(2, newRank);
-                    pst.setString(3, currentName);
-                    pst.executeUpdate();
-                    
-                    JOptionPane.showMessageDialog(this, "Database Updated!");
-                    loadInitialData();
-                    refreshTable();
-                } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(this, "Update Failed: " + e.getMessage());
-                }
+        if (newVillage != null && newRank != null) {
+            try (Connection conn = Database.getConnection()) {
+                // Correctly targeting the attributes you created
+                String sql = "UPDATE users SET village = ?, rank = ? WHERE username = ?";
+                PreparedStatement pst = conn.prepareStatement(sql);
+                pst.setString(1, newVillage);
+                pst.setString(2, newRank);
+                pst.setString(3, currentName);
+                pst.executeUpdate();
+                
+                JOptionPane.showMessageDialog(this, "Records Updated for " + currentName + "!");
+                loadInitialData();
+                refreshTable();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Update Failed: " + e.getMessage());
             }
-        }                 
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "Select a Shinobi to update!");
+    }              
     }//GEN-LAST:event_updateActionPerformed
 
     private void readActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readActionPerformed
-                                    
-                                     
-    // Unicode escapes for compatibility: 
-    // \uD83E\uDD77 = Ninja, \uD83D\uDCDC = Scroll, \uD83D\uDEE1 = Shield
+                                                                  
     String[] options = {"Read Selected \uD83E\uDD77", "Read All Codex \uD83D\uDCDC", "Cancel"};
     
     int choice = JOptionPane.showOptionDialog(this, 
-        "Decrypting the Midnight Archives... \nSelect information depth:", 
+        "Decrypting the Midnight Archives...", 
         "Shinobi Intelligence Access", 
         JOptionPane.DEFAULT_OPTION, 
         JOptionPane.QUESTION_MESSAGE, 
         null, options, options[0]);
 
-    if (choice == 0) { // --- READ SELECTED TARGET ---
+    if (choice == 0) { // --- READ SELECTED ---
         int row = jTable1.getSelectedRow();
         if (row != -1) {
             DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
             
+            // Fixed: Changed "CHAKRA" and "POWER" to "CLAN"
             var intel = " \uD83D\uDEE1  TARGET CLASSIFIED DATA \n" +
                            "==========================\n" +
                            " NAME    : " + model.getValueAt(row, 0) + "\n" +
-                           " CHAKRA  : " + model.getValueAt(row, 1) + "\n" +
-                           " RANK : " + model.getValueAt(row, 2) + "\n" +
+                           " CLAN    : " + model.getValueAt(row, 1) + "\n" + // Fixed label
+                           " RANK    : " + model.getValueAt(row, 2) + "\n" +
                            " VILLAGE : " + model.getValueAt(row, 3) + "\n" +
                            "==========================";
             
@@ -307,9 +308,9 @@ public class Dashboard extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "No target identified in the shadows! \u26A0\uFE0F");
         }
         
-    } else if (choice == 1) { // --- READ ALL ENTRIES ---
+    } else if (choice == 1) { // --- READ ALL ---
         if (players.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "The archives are empty. No Shinobi found.");
+            JOptionPane.showMessageDialog(this, "The archives are empty.");
             return;
         }
         
@@ -320,28 +321,21 @@ public class Dashboard extends javax.swing.JFrame {
         for (int i = 0; i < players.size(); i++) {
             String[] p = players.get(i);
             sb.append(" SHINOBI UNIT #").append(i + 1).append("\n");
-            sb.append(" [NAME]      : ").append(p[0]).append("\n");
-            sb.append(" [POWER]   : ").append(p[1]).append("\n");
+            sb.append(" [NAME]    : ").append(p[0]).append("\n");
+            sb.append(" [CLAN]    : ").append(p[1]).append("\n"); // Fixed label
             sb.append(" [RANK]    : ").append(p[2]).append("\n");
             sb.append(" [ORIGIN]  : ").append(p[3]).append("\n");
-            sb.append("------------------------------------\n"); // "Next" separator
+            sb.append("------------------------------------\n");
         }
         
-        sb.append("\n TOTAL ACTIVE SHINOBI: ").append(players.size());
-        
-        // JTextArea ensures the alignment looks professional in the popup
         javax.swing.JTextArea textArea = new javax.swing.JTextArea(sb.toString());
         textArea.setEditable(false);
         textArea.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 12));
-        textArea.setBackground(new java.awt.Color(240, 240, 240));
-        
         javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(textArea);
         scrollPane.setPreferredSize(new java.awt.Dimension(380, 400));
         
         JOptionPane.showMessageDialog(this, scrollPane, "Full Intel Report", JOptionPane.PLAIN_MESSAGE);
     }
-
-
     }//GEN-LAST:event_readActionPerformed
 
     private void createActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createActionPerformed

@@ -282,65 +282,69 @@ public class Register extends javax.swing.JFrame {
     }//GEN-LAST:event_OriginActionPerformed
 
     private void signupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signupActionPerformed
-        String user = username.getText().trim();
-        String rankLevel = Rank.getText().trim(); 
-        String village = Origin.getText().trim();
-        String pass1 = new String(password.getPassword());
-        String pass2 = new String(confirmpass.getPassword());
+    // 1. DATA EXTRACTION
+    String user = username.getText().trim();
+    String cln = clan.getText().trim(); 
+    String rankLevel = Rank.getText().trim(); 
+    String village = Origin.getText().trim();
+    String pass1 = new String(password.getPassword());
+    String pass2 = new String(confirmpass.getPassword());
 
-        // 1. Validation Logic
-        if (user.isEmpty() || user.equals("Shinobi Name: (Username)") ||
-            rankLevel.isEmpty() || rankLevel.equals("Rank:") || 
-            village.isEmpty() || village.equals("Village Origin") ||
-            pass1.isEmpty() || pass1.equals("Chakra Key: (Password)")) {
-            
-            JOptionPane.showMessageDialog(this, "All scrolls must be filled! ⚠️", "Incomplete Jutsu", JOptionPane.WARNING_MESSAGE);
+    // 2. VALIDATION LOGIC 
+    if (user.isEmpty() || user.equals("Shinobi Name: (Username)") ||
+        cln.isEmpty() || cln.equals("Clan Name") ||
+        rankLevel.isEmpty() || rankLevel.equals("Rank:") || 
+        village.isEmpty() || village.equals("Village Origin") ||
+        pass1.isEmpty() || pass1.equals("Chakra Key: (Password)")) {
+        
+        JOptionPane.showMessageDialog(this, "All scrolls must be filled! ⚠️", "Incomplete Jutsu", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    if (!pass1.equals(pass2)) {
+        JOptionPane.showMessageDialog(this, "The Forbidden Seals do not match! ❌", "Chakra Mismatch", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // 3. DATABASE RECORDING
+    try (Connection conn = Database.getConnection()) {
+        if (conn == null) {
+            JOptionPane.showMessageDialog(this, "The Village Gates are closed. (DB Connection Failed)");
             return;
         }
 
-        if (!pass1.equals(pass2)) {
-            JOptionPane.showMessageDialog(this, "The Forbidden Seals do not match! ❌", "Chakra Mismatch", JOptionPane.ERROR_MESSAGE);
+        // Check if user already exists
+        String checkSql = "SELECT username FROM users WHERE username = ?";
+        PreparedStatement checkPst = conn.prepareStatement(checkSql);
+        checkPst.setString(1, user);
+        if (checkPst.executeQuery().next()) {
+            JOptionPane.showMessageDialog(this, "That name is already in the registry!");
             return;
         }
 
-        // --- NEW CLAN LOGIC: Extract from Last Name ---
-        String[] nameParts = user.split("\\s+");
-        String clanName = (nameParts.length > 1) ? nameParts[nameParts.length - 1] : user;
+        // INSERT statement - Explicitly mapping each attribute to its own column
+        // Make sure your SQL table order is: username, password, village, rank, clan
+        String sql = "INSERT INTO users (username, password, village, rank, clan) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement pst = conn.prepareStatement(sql);
+        
+        pst.setString(1, user);      // Saved to 'username' column
+        pst.setString(2, pass1);     // Saved to 'password' column
+        pst.setString(3, village);   // Saved to 'village' column
+        pst.setString(4, rankLevel); // Saved to 'rank' column
+        pst.setString(5, cln);       // Saved to 'clan' column (The fix!)
 
-        // 2. Database Logic
-        try (Connection conn = Database.getConnection()) {
-            if (conn == null) {
-                JOptionPane.showMessageDialog(this, "The Village Gates are closed. (DB Connection Failed)");
-                return;
-            }
+        pst.executeUpdate();
+        
+        // 4. THE FINAL WELCOME MESSAGE (Only shows the Username as requested)
+        JOptionPane.showMessageDialog(this, "Welcome, " + user + "!");
 
-            // Check if user already exists
-            String checkSql = "SELECT username FROM users WHERE username = ?";
-            PreparedStatement checkPst = conn.prepareStatement(checkSql);
-            checkPst.setString(1, user);
-            if (checkPst.executeQuery().next()) {
-                JOptionPane.showMessageDialog(this, "That name is already in the registry!");
-                return;
-            }
-
-            // --- FIXED: Added 'clan' to the INSERT statement ---
-            String sql = "INSERT INTO users (username, password, village, rank, clan) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, user);
-            pst.setString(2, pass1);
-            pst.setString(3, village);
-            pst.setString(4, rankLevel);
-            pst.setString(5, clanName); // This saves your last name as the Clan
-
-            pst.executeUpdate();
-            
-            JOptionPane.showMessageDialog(this, "Enrollment Successful! 🥷\nWelcome to the " + clanName + " Clan.");
-            new Login().setVisible(true);
-            this.dispose();
-            
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
-        }
+        // Move to Login
+        new Login().setVisible(true);
+        this.dispose();
+        
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
+    }
     }//GEN-LAST:event_signupActionPerformed
 
     private void passwordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordActionPerformed
