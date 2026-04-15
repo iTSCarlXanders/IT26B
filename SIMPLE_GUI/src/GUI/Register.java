@@ -10,8 +10,9 @@ import java.awt.Color;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import javax.swing.UnsupportedLookAndFeelException;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import javax.swing.JOptionPane;
 /**
  *
@@ -21,43 +22,35 @@ public class Register extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Register.class.getName());
 
-    /**
-     * Creates new form Register
-     */
-   public Register() {
-    initComponents();
-    this.setLocationRelativeTo(null); 
-    
+    public Register() {
+        initComponents();
+        this.setLocationRelativeTo(null); 
 
-    // 1. Clean up Checkbox appearance
-    jCheckBox1.setOpaque(false);
-    jCheckBox1.setText(""); 
-    jCheckBox2.setOpaque(false);
-    jCheckBox2.setText("");
+        // 1. Clean up Checkbox appearance
+        jCheckBox1.setOpaque(false);
+        jCheckBox1.setText(""); 
+        jCheckBox2.setOpaque(false);
+        jCheckBox2.setText("");
 
-    // 2. Setup Placeholders
-    setupField(username, "Shinobi Name: (Username)");
-    setupField(clan, "Clan Lineage:");
-    setupField(Rank, "Rank:");
-    setupField(Origin, "Village Origin");
-    setupField(password, "Chakra Key: (Password)");
-    setupField(confirmpass, "Confirm Password:");
+        // 2. Setup Placeholders
+        setupField(username, "Shinobi Name: (Username)");
+        setupField(clan, "Clan Lineage:");
+        setupField(Rank, "Rank:");
+        setupField(Origin, "Village Origin");
+        setupField(password, "Chakra Key: (Password)");
+        setupField(confirmpass, "Confirm Password:");
 
-    // 3. THE PERFECT FIX FOR ABSOLUTE LAYOUT:
-    // Force checkboxes to the very front
-    jPanel2.setComponentZOrder(jCheckBox1, 0);
-    jPanel2.setComponentZOrder(jCheckBox2, 0);
-    
-    
+        // 3. Force checkboxes to the very front for Absolute Layout
+        jPanel2.setComponentZOrder(jCheckBox1, 0);
+        jPanel2.setComponentZOrder(jCheckBox2, 0);
 
-    // Refresh layout
-    jPanel2.revalidate();
-    jPanel2.repaint();
-}
+        jPanel2.revalidate();
+        jPanel2.repaint();
+    }
 
     private void setupField(JTextField field, String hint) {
         field.setText(hint);
-        field.setForeground(new Color(15, 20, 30));
+        field.setForeground(new Color(153, 153, 153));
         
         if (field instanceof JPasswordField jPasswordField) {
             jPasswordField.setEchoChar((char) 0);
@@ -74,7 +67,6 @@ public class Register extends javax.swing.JFrame {
                     textField.setText("");
                     textField.setForeground(new Color(46, 26, 5)); // Ink Brown
                     if (textField instanceof JPasswordField jPasswordField) {
-                        // Use dots only if we aren't clicking the "show password" box
                         if (!(textField == password && jCheckBox1.isSelected()) && 
                             !(textField == confirmpass && jCheckBox2.isSelected())) {
                             jPasswordField.setEchoChar('•');
@@ -95,25 +87,20 @@ public class Register extends javax.swing.JFrame {
             }
         });
     }
-    public static String registeredUser = "";
-    public static String registeredPass = "";
+
     private void togglePassword(JPasswordField field, javax.swing.JCheckBox check, String hint) {
-    String currentText = field.getText();
-    
-    if (check.isSelected()) {
-        // Always show text if checked
-        field.setEchoChar((char) 0);
-    } else {
-        // Only hide if the text is NOT the hint and NOT empty
-        if (currentText.equals(hint) || currentText.isEmpty()) {
+        String currentText = field.getText();
+        if (check.isSelected()) {
             field.setEchoChar((char) 0);
         } else {
-            field.setEchoChar('•');
+            if (currentText.equals(hint) || currentText.isEmpty()) {
+                field.setEchoChar((char) 0);
+            } else {
+                field.setEchoChar('•');
+            }
         }
+        field.repaint();
     }
-    // Force the field to redraw immediately
-    field.repaint();
-}
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -296,39 +283,59 @@ public class Register extends javax.swing.JFrame {
 
     private void signupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signupActionPerformed
         String user = username.getText().trim();
-    String clanLineage = clan.getText().trim();
-    String rankLevel = Rank.getText().trim(); 
-    String village = Origin.getText().trim();
-    String pass1 = new String(password.getPassword());
-    String pass2 = new String(confirmpass.getPassword());
+        String rankLevel = Rank.getText().trim(); 
+        String village = Origin.getText().trim();
+        String pass1 = new String(password.getPassword());
+        String pass2 = new String(confirmpass.getPassword());
 
-    // Validation
-    if (user.isEmpty() || user.equals("Shinobi Name: (Username)") ||
-        clanLineage.isEmpty() || clanLineage.equals("Clan Lineage:") ||
-        rankLevel.isEmpty() || rankLevel.equals("Rank:") || // Check for Rank placeholder
-        village.isEmpty() || village.equals("Village Origin") ||
-        pass1.isEmpty() || pass2.isEmpty()) {
-        
-        JOptionPane.showMessageDialog(this, "All scrolls must be filled! \u26A0\uFE0F", "Incomplete Jutsu", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
+        // 1. Validation Logic
+        if (user.isEmpty() || user.equals("Shinobi Name: (Username)") ||
+            rankLevel.isEmpty() || rankLevel.equals("Rank:") || 
+            village.isEmpty() || village.equals("Village Origin") ||
+            pass1.isEmpty() || pass1.equals("Chakra Key: (Password)")) {
+            
+            JOptionPane.showMessageDialog(this, "All scrolls must be filled! ⚠️", "Incomplete Jutsu", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
-    if (!pass1.equals(pass2)) {
-        JOptionPane.showMessageDialog(this, "The Forbidden Seals do not match! \u274C", "Chakra Mismatch", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
+        if (!pass1.equals(pass2)) {
+            JOptionPane.showMessageDialog(this, "The Forbidden Seals do not match! ❌", "Chakra Mismatch", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-    // Saving Data: Adding rankLevel to the comma-separated line
-    try (FileWriter writer = new FileWriter("registry.txt", true)) {
-        // Saved Format: Username,Password,Village,Rank
-        writer.write(user + "," + pass1 + "," + village + "," + rankLevel + "\n");
-        
-        JOptionPane.showMessageDialog(this, "Enrollment Successful! \uD83E\uDD77\nYour rank is recorded in the Great Scroll.");
-        new Login().setVisible(true);
-        this.dispose();
-    } catch (IOException e) {
-        JOptionPane.showMessageDialog(this, "The Village Scroll is locked. Error saving data.");
-    }
+        // 2. Database Logic
+        try (Connection conn = Database.getConnection()) {
+            if (conn == null) {
+                JOptionPane.showMessageDialog(this, "The Village Gates are closed. (DB Connection Failed)");
+                return;
+            }
+
+            // Check if user already exists
+            String checkSql = "SELECT username FROM users WHERE username = ?";
+            PreparedStatement checkPst = conn.prepareStatement(checkSql);
+            checkPst.setString(1, user);
+            if (checkPst.executeQuery().next()) {
+                JOptionPane.showMessageDialog(this, "That name is already in the registry!");
+                return;
+            }
+
+            // Insert new user
+            String sql = "INSERT INTO users (username, password, village, rank) VALUES (?, ?, ?, ?)";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, user);
+            pst.setString(2, pass1);
+            pst.setString(3, village);
+            pst.setString(4, rankLevel);
+
+            pst.executeUpdate();
+            
+            JOptionPane.showMessageDialog(this, "Enrollment Successful! 🥷\nYour rank is recorded in the Great Scroll.");
+            new Login().setVisible(true);
+            this.dispose();
+            
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
+        }
     }//GEN-LAST:event_signupActionPerformed
 
     private void passwordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordActionPerformed
@@ -345,18 +352,11 @@ public class Register extends javax.swing.JFrame {
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-    Login loginPage = new Login(); 
-    
-    // 2. Show the Login window
-    loginPage.setVisible(true);
-    
-    // 3. Close the current Register window
-    this.dispose();
+    new Login().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_backActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
+    
     public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
