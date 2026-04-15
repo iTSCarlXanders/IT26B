@@ -5,9 +5,10 @@
 package GUI;
 
 import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import javax.swing.JButton;
@@ -22,7 +23,6 @@ import javax.swing.table.DefaultTableModel;
 public class Dashboard extends javax.swing.JFrame {
 
     private ArrayList<String[]> players = new ArrayList<>();
-    private ArrayList<String[]> undoStack = new ArrayList<>();
     private String loggedInUser;
     
     public Dashboard(String username) {
@@ -48,29 +48,26 @@ public class Dashboard extends javax.swing.JFrame {
     }
 
    private void loadInitialData() {
-        String village = "Unknown Village"; 
-        String rank = "Genin"; // Default rank
+        players.clear();
+        // SELECT ALL USERS so the dashboard shows the full directory
+        String sql = "SELECT username, village, rank FROM users";
         
-        try (BufferedReader br = new BufferedReader(new FileReader("registry.txt"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] details = line.split(",");
-                // Expected format: Username, Password, Village, Rank
-                if (details.length >= 4 && details[0].equalsIgnoreCase(loggedInUser)) {
-                    village = details[2];
-                    rank = details[3];
-                    break;
-                } else if (details.length == 3 && details[0].equalsIgnoreCase(loggedInUser)) {
-                    // Fallback for older 3-column records
-                    village = details[2];
-                }
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pst = conn.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            
+            while (rs.next()) {
+                // Formatting: Name, Placeholder Chakra (1000), Rank, Village
+                players.add(new String[]{
+                    rs.getString("username"), 
+                    "1000", 
+                    rs.getString("rank"), 
+                    rs.getString("village")
+                });
             }
-        } catch (IOException e) {
-            System.out.println("Error reading registry: " + e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("Database Load Error: " + e.getMessage());
         }
-        
-        // Add the logged-in user as the first entry in the dashboard
-        players.add(new String[]{loggedInUser, "1000", rank, village});
     }
 
     private void refreshTable() {
@@ -88,14 +85,8 @@ public class Dashboard extends javax.swing.JFrame {
     private void filterTable() {
         String query = search.getText().toLowerCase();
         ArrayList<String[]> filteredList = new ArrayList<>();
-        
         for (String[] p : players) {
-            // Checks Name [0], Chakra [1], Rank [2], and Village/Origin [3]
-            if (p[0].toLowerCase().contains(query) || 
-                p[1].toLowerCase().contains(query) || 
-                p[2].toLowerCase().contains(query) || 
-                p[3].toLowerCase().contains(query)) {
-                
+            if (p[0].toLowerCase().contains(query) || p[2].toLowerCase().contains(query) || p[3].toLowerCase().contains(query)) {
                 filteredList.add(p);
             }
         }
@@ -107,10 +98,6 @@ public class Dashboard extends javax.swing.JFrame {
         Collections.sort(players, (String[] s1, String[] s2) -> {
             switch (choice) {
                 case 0: return s1[0].compareToIgnoreCase(s2[0]); 
-                case 1: 
-                    try {
-                        return Integer.compare(Integer.parseInt(s1[1]), Integer.parseInt(s2[1]));
-                    } catch (NumberFormatException e) { return 0; }
                 case 2: return s1[2].compareToIgnoreCase(s2[2]); 
                 case 3: return s1[3].compareToIgnoreCase(s2[3]); 
                 default: return 0;
@@ -136,7 +123,7 @@ public class Dashboard extends javax.swing.JFrame {
             b.setOpaque(false);
             b.setContentAreaFilled(false);
             b.setBorderPainted(false);
-            b.setForeground(Color.BLACK);
+            b.setForeground(Color.WHITE); 
         }
     }
     @SuppressWarnings("unchecked")
@@ -260,39 +247,28 @@ public class Dashboard extends javax.swing.JFrame {
 
     private void updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateActionPerformed
     int row = jTable1.getSelectedRow();
-    
-    if (row != -1) {
-        // 1. Get current data from the table (handling filtered/sorted views)
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        String currentName = (String) model.getValueAt(row, 0);
-        
-        // 2. Find the actual object in your 'players' ArrayList
-        for (String[] p : players) {
-            if (p[0].equals(currentName)) {
-                
-                // 3. Ask user for new details (Pre-filled with current values)
-                String newName = JOptionPane.showInputDialog(this, "Update Name:", p[0]);
-                if (newName == null || newName.trim().isEmpty()) return; // Cancel if empty
+        if (row != -1) {
+            String currentName = (String) jTable1.getValueAt(row, 0);
+            String newVillage = JOptionPane.showInputDialog(this, "New Village:", jTable1.getValueAt(row, 3));
+            String newRank = JOptionPane.showInputDialog(this, "New Rank:", jTable1.getValueAt(row, 2));
 
-                String newChakra = JOptionPane.showInputDialog(this, "Update Chakra Power:", p[1]);
-                String newMastery = JOptionPane.showInputDialog(this, "Update Rank:", p[2]);
-                String newVillage = JOptionPane.showInputDialog(this, "Update Village:", p[3]);
-
-                // 4. Apply changes to the ArrayList
-                p[0] = newName;
-                p[1] = newChakra;
-                p[2] = newMastery;
-                p[3] = newVillage;
-
-                // 5. Refresh visuals
-                applySort(); 
-                JOptionPane.showMessageDialog(this, "Shinobi Intel Updated!");
-                break;
+            if (newVillage != null && newRank != null) {
+                try (Connection conn = Database.getConnection()) {
+                    String sql = "UPDATE users SET village = ?, rank = ? WHERE username = ?";
+                    PreparedStatement pst = conn.prepareStatement(sql);
+                    pst.setString(1, newVillage);
+                    pst.setString(2, newRank);
+                    pst.setString(3, currentName);
+                    pst.executeUpdate();
+                    
+                    JOptionPane.showMessageDialog(this, "Database Updated!");
+                    loadInitialData();
+                    refreshTable();
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(this, "Update Failed: " + e.getMessage());
+                }
             }
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Please select a Shinobi from the table to update.");
-    }                
+        }                 
     }//GEN-LAST:event_updateActionPerformed
 
     private void readActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readActionPerformed
@@ -314,7 +290,7 @@ public class Dashboard extends javax.swing.JFrame {
         if (row != -1) {
             DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
             
-            String intel = " \uD83D\uDEE1  TARGET CLASSIFIED DATA \n" +
+            var intel = " \uD83D\uDEE1  TARGET CLASSIFIED DATA \n" +
                            "==========================\n" +
                            " NAME    : " + model.getValueAt(row, 0) + "\n" +
                            " CHAKRA  : " + model.getValueAt(row, 1) + "\n" +
@@ -365,34 +341,50 @@ public class Dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_readActionPerformed
 
     private void createActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createActionPerformed
-       String name = JOptionPane.showInputDialog(this, "Enter Shinobi Name:");
+       String name = JOptionPane.showInputDialog(this, "Shinobi Name:");
         if (name != null && !name.trim().isEmpty()) {
-            String chakra = JOptionPane.showInputDialog(this, "Chakra Level:");
-            String mastery = JOptionPane.showInputDialog(this, "Rank:");
+            String pass = JOptionPane.showInputDialog(this, "Assign Password:");
             String village = JOptionPane.showInputDialog(this, "Village:");
-            
-            players.add(new String[]{name, chakra, mastery, village});
-            applySort();
-            JOptionPane.showMessageDialog(this, "Shinobi Added!");
+            String rank = JOptionPane.showInputDialog(this, "Rank:");
+
+            try (Connection conn = Database.getConnection()) {
+                String sql = "INSERT INTO users (username, password, village, rank) VALUES (?, ?, ?, ?)";
+                PreparedStatement pst = conn.prepareStatement(sql);
+                pst.setString(1, name);
+                pst.setString(2, pass);
+                pst.setString(3, village);
+                pst.setString(4, rank);
+                pst.executeUpdate();
+                
+                JOptionPane.showMessageDialog(this, "Shinobi recorded in Database!");
+                loadInitialData();
+                refreshTable();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Creation Failed: " + e.getMessage());
+            }
         }
     }//GEN-LAST:event_createActionPerformed
 
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
        int row = jTable1.getSelectedRow();
         if (row != -1) {
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            String nameToDelete = (String) model.getValueAt(row, 0);
+            String nameToDelete = (String) jTable1.getValueAt(row, 0);
+            int confirm = JOptionPane.showConfirmDialog(this, "Permanently exile " + nameToDelete + "?", "Exile", JOptionPane.YES_NO_OPTION);
             
-            // Find in original list to sync with Undo stack
-            for (int i = 0; i < players.size(); i++) {
-                if (players.get(i)[0].equals(nameToDelete)) {
-                    undoStack.add(players.remove(i));
-                    break;
+            if (confirm == JOptionPane.YES_OPTION) {
+                try (Connection conn = Database.getConnection()) {
+                    String sql = "DELETE FROM users WHERE username = ?";
+                    PreparedStatement pst = conn.prepareStatement(sql);
+                    pst.setString(1, nameToDelete);
+                    pst.executeUpdate();
+                    
+                    JOptionPane.showMessageDialog(this, "Shinobi removed from records.");
+                    loadInitialData();
+                    refreshTable();
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(this, "Delete Failed: " + e.getMessage());
                 }
             }
-            filterTable();
-        } else {
-            JOptionPane.showMessageDialog(this, "Select an entry to delete.");
         }
     }//GEN-LAST:event_deleteActionPerformed
 
