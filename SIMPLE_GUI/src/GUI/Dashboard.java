@@ -250,32 +250,35 @@ public class Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateActionPerformed
-                                        int row = jTable1.getSelectedRow();
-    if (row != -1) {
-        String currentName = (String) jTable1.getValueAt(row, 0);
-        String newVillage = JOptionPane.showInputDialog(this, "Update Village Origin:", jTable1.getValueAt(row, 3));
-        String newRank = JOptionPane.showInputDialog(this, "Update Shinobi Rank:", jTable1.getValueAt(row, 2));
+            int row = jTable1.getSelectedRow();
+        if (row != -1) {
+            String currentName = (String) jTable1.getValueAt(row, 0);
+            
+            // Separate manual inputs for each attribute
+            String newClan = JOptionPane.showInputDialog(this, "Update Clan:", jTable1.getValueAt(row, 1));
+            String newRank = JOptionPane.showInputDialog(this, "Update Shinobi Rank:", jTable1.getValueAt(row, 2));
+            String newVillage = JOptionPane.showInputDialog(this, "Update Village Origin:", jTable1.getValueAt(row, 3));
 
-        if (newVillage != null && newRank != null) {
-            try (Connection conn = Database.getConnection()) {
-                // Correctly targeting the attributes you created
-                String sql = "UPDATE users SET village = ?, rank = ? WHERE username = ?";
-                PreparedStatement pst = conn.prepareStatement(sql);
-                pst.setString(1, newVillage);
-                pst.setString(2, newRank);
-                pst.setString(3, currentName);
-                pst.executeUpdate();
-                
-                JOptionPane.showMessageDialog(this, "Records Updated for " + currentName + "!");
-                loadInitialData();
-                refreshTable();
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Update Failed: " + e.getMessage());
+            if (newClan != null && newVillage != null && newRank != null) {
+                try (Connection conn = Database.getConnection()) {
+                    String sql = "UPDATE users SET clan = ?, rank = ?, village = ? WHERE username = ?";
+                    PreparedStatement pst = conn.prepareStatement(sql);
+                    pst.setString(1, newClan);
+                    pst.setString(2, newRank);
+                    pst.setString(3, newVillage);
+                    pst.setString(4, currentName);
+                    pst.executeUpdate();
+                    
+                    JOptionPane.showMessageDialog(this, "Archives Updated for " + currentName + "!");
+                    loadInitialData();
+                    refreshTable();
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(this, "Update Failed: " + e.getMessage());
+                }
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "Select a Shinobi from the shadows to update!");
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Select a Shinobi to update!");
-    }              
     }//GEN-LAST:event_updateActionPerformed
 
     private void readActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readActionPerformed
@@ -337,47 +340,34 @@ public class Dashboard extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, scrollPane, "Full Intel Report", JOptionPane.PLAIN_MESSAGE);
     }
     }//GEN-LAST:event_readActionPerformed
-
     private void createActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createActionPerformed
                                       
-    // Example: User enters "Naruto Uzumaki"
-    String fullName = JOptionPane.showInputDialog(this, "Enter Full Name (First Last):");
-    
-    if (fullName != null && !fullName.trim().isEmpty()) {
-        String pass = JOptionPane.showInputDialog(this, "Set Password:");
-        String village = JOptionPane.showInputDialog(this, "Village:");
-        String rank = JOptionPane.showInputDialog(this, "Rank:");
+    String newName = JOptionPane.showInputDialog(this, "Enter Username:");
+        if (newName == null || newName.trim().isEmpty()) return;
 
-        // --- AUTOMATIC CLAN FROM LAST NAME LOGIC ---
-        String clanName = "Unknown";
-        String[] nameParts = fullName.trim().split("\\s+"); // Splits name by spaces
-        
-        if (nameParts.length > 1) {
-            // Takes the very last word as the Clan
-            clanName = nameParts[nameParts.length - 1]; 
-        } else {
-            // If they only enter one name, it uses the name itself as the clan
-            clanName = nameParts[0]; 
-        }
+        String newClan = JOptionPane.showInputDialog(this, "Enter Clan:");
+        String newPass = JOptionPane.showInputDialog(this, "Set Password:");
+        String newRank = JOptionPane.showInputDialog(this, "Set Rank:");
+        String newVillage = JOptionPane.showInputDialog(this, "Set Village:");
 
-        try (Connection conn = Database.getConnection()) {
-            String sql = "INSERT INTO users (username, clan, village, rank, password) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, fullName);
-            pst.setString(2, clanName); // Automatically saved as the last name
-            pst.setString(3, village);
-            pst.setString(4, rank);
-            pst.setString(5, pass);
-            pst.executeUpdate();
-            
-            JOptionPane.showMessageDialog(this, "Shinobi Registered!\nName: " + fullName + "\nClan: " + clanName);
-            
-            loadInitialData();
-            refreshTable();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
+        if (newClan != null && newPass != null) {
+            try (Connection conn = Database.getConnection()) {
+                String sql = "INSERT INTO users (username, clan, password, rank, village) VALUES (?, ?, ?, ?, ?)";
+                PreparedStatement pst = conn.prepareStatement(sql);
+                pst.setString(1, newName);
+                pst.setString(2, newClan);
+                pst.setString(3, newPass);
+                pst.setString(4, newRank);
+                pst.setString(5, newVillage);
+                pst.executeUpdate();
+                
+                JOptionPane.showMessageDialog(this, "Shinobi Registered!");
+                loadInitialData();
+                refreshTable();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
+            }
         }
-    }
     }//GEN-LAST:event_createActionPerformed
 
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
