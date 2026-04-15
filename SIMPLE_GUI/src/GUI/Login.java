@@ -7,8 +7,11 @@ package GUI;
     import java.awt.Color;
     import java.awt.event.FocusEvent;
     import java.awt.event.FocusListener;
+    import java.sql.Connection;
+    import java.sql.PreparedStatement;
+    import java.sql.ResultSet;
+    import java.sql.SQLException;
     import javax.swing.JOptionPane;
-    import javax.swing.UnsupportedLookAndFeelException;
 
 public class Login extends javax.swing.JFrame {
 
@@ -226,45 +229,42 @@ public class Login extends javax.swing.JFrame {
         String typedPass = new String(password.getPassword());
         
         // Prevent login if placeholders are still present
-        if (typedUser.equals("Clan ID") || typedPass.equals("Chakra Key")) {
-            JOptionPane.showMessageDialog(this, "Please enter your credentials.");
+        if (typedUser.equals("Username") || typedPass.equals("Chakra Key") || typedUser.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "The scroll is empty. Enter your credentials.");
             return;
         }
 
-        boolean found = false;
-
-        // Admin override
-        if (typedUser.equals("Admin") && typedPass.equals("1234")) {
-            found = true;
-        } else {
-            try {
-                java.io.File file = new java.io.File("registry.txt");
-                if (file.exists()) {
-                    java.util.Scanner scanner = new java.util.Scanner(file);
-                    while (scanner.hasNextLine()) {
-                        String line = scanner.nextLine();
-                        String[] details = line.split(","); 
-                        if (details.length >= 2) {
-                            if (details[0].equals(typedUser) && details[1].equals(typedPass)) {
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                    scanner.close();
-                }
-            } catch (java.io.FileNotFoundException e) {
-                System.out.println("No registry file found.");
+        // --- MYSQL CONNECTION LOGIC ---
+        try (Connection conn = Database.getConnection()) {
+            if (conn == null) {
+                JOptionPane.showMessageDialog(this, "Cannot connect to the Shinobi registry (it26).");
+                return;
             }
-        }
 
-        if (found) {
-            JOptionPane.showMessageDialog(this, "Access Granted!");
-            // CRITICAL FIX: Pass the username to the Dashboard
-            new Dashboard(typedUser).setVisible(true);
-            this.dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "Invalid credentials!", "Denied", JOptionPane.ERROR_MESSAGE);
+            // Prepared Statement to prevent SQL Injection
+            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, typedUser);
+            pst.setString(2, typedPass);
+
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                JOptionPane.showMessageDialog(this, "Access Granted, Ninja!");
+                new Dashboard(typedUser).setVisible(true);
+                this.dispose();
+            } else {
+                // Hardcoded Admin fallback
+                if (typedUser.equals("Admin") && typedPass.equals("1234")) {
+                    JOptionPane.showMessageDialog(this, "Admin Access Granted!");
+                    new Dashboard(typedUser).setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Invalid credentials! Your jutsu is weak.", "Denied", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
         }
     }//GEN-LAST:event_accessportalActionPerformed
 
