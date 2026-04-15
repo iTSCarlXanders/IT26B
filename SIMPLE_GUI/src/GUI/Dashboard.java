@@ -81,29 +81,34 @@ public class Dashboard extends javax.swing.JFrame {
         }
     }
 
-    private void filterTable() {
-        String query = search.getText().toLowerCase();
-        ArrayList<String[]> filteredList = new ArrayList<>();
-        for (String[] p : players) {
-            if (p[0].toLowerCase().contains(query) || p[2].toLowerCase().contains(query) || p[3].toLowerCase().contains(query)) {
-                filteredList.add(p);
-            }
+   private void filterTable() {
+    String query = search.getText().toLowerCase();
+    ArrayList<String[]> filteredList = new ArrayList<>();
+    for (String[] p : players) {
+        // Added p[1] here so the search bar actually looks at the Clan column
+        if (p[0].toLowerCase().contains(query) || 
+            p[1].toLowerCase().contains(query) || 
+            p[2].toLowerCase().contains(query) || 
+            p[3].toLowerCase().contains(query)) {
+            filteredList.add(p);
         }
-        updateTableContent(filteredList);
     }
+    updateTableContent(filteredList);
+}
 
-    private void applySort() {
-        int choice = sort.getSelectedIndex();
-        Collections.sort(players, (String[] s1, String[] s2) -> {
-            switch (choice) {
-                case 0: return s1[0].compareToIgnoreCase(s2[0]); 
-                case 2: return s1[2].compareToIgnoreCase(s2[2]); 
-                case 3: return s1[3].compareToIgnoreCase(s2[3]); 
-                default: return 0;
-            }
-        });
-        filterTable(); 
-    }
+   private void applySort() {
+    int choice = sort.getSelectedIndex();
+    Collections.sort(players, (String[] s1, String[] s2) -> {
+        switch (choice) {
+            case 0: return s1[0].compareToIgnoreCase(s2[0]); // Name
+            case 1: return s1[1].compareToIgnoreCase(s2[1]); // Clan 
+            case 2: return s1[2].compareToIgnoreCase(s2[2]); // Rank
+            case 3: return s1[3].compareToIgnoreCase(s2[3]); // Village
+            default: return 0;
+        }
+    });
+    filterTable(); 
+}
 
     private void stylizeInterface() {
         jPanel2.setOpaque(false);
