@@ -49,7 +49,7 @@ public class Dashboard extends javax.swing.JFrame {
 
    private void loadInitialData() {
     players.clear();
-    // Update the SQL to select 'clan' instead of 'chakra_level'
+    
     String sql = "SELECT username, clan, rank, village FROM users";
     
     try (Connection conn = Database.getConnection();
@@ -115,13 +115,13 @@ public class Dashboard extends javax.swing.JFrame {
         jScrollPane1.setOpaque(false);
         jScrollPane1.getViewport().setOpaque(false);
         jTable1.setOpaque(false);
-        
+            
         search.setBackground(new Color(30, 30, 30));
         search.setForeground(Color.WHITE);
         search.setCaretColor(Color.WHITE);
         sort.setBackground(new Color(44, 44, 46));
         sort.setForeground(Color.WHITE);
-        
+              
         JButton[] btns = {update, create, read, delete, Logout};
         for (JButton b : btns) {
             b.setOpaque(false);
@@ -155,11 +155,13 @@ public class Dashboard extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(44, 44, 46, 180));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        sort.setFont(new java.awt.Font("Segoe Print", 1, 12)); // NOI18N
         sort.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Name", "Clan", "Rank", "Origin" }));
         jPanel2.add(sort, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 110, 90, 20));
 
         update.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
         update.setText("UPDATE");
+        update.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         update.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 updateActionPerformed(evt);
@@ -169,6 +171,7 @@ public class Dashboard extends javax.swing.JFrame {
 
         create.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
         create.setText("CREATE");
+        create.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         create.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createActionPerformed(evt);
@@ -178,6 +181,7 @@ public class Dashboard extends javax.swing.JFrame {
 
         read.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
         read.setText("READ");
+        read.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         read.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 readActionPerformed(evt);
@@ -187,6 +191,7 @@ public class Dashboard extends javax.swing.JFrame {
 
         delete.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
         delete.setText("DELETE");
+        delete.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         delete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteActionPerformed(evt);
@@ -196,6 +201,7 @@ public class Dashboard extends javax.swing.JFrame {
 
         Logout.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
         Logout.setText("LOG OUT");
+        Logout.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         Logout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 LogoutActionPerformed(evt);
@@ -203,6 +209,7 @@ public class Dashboard extends javax.swing.JFrame {
         });
         jPanel2.add(Logout, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 400, 110, 40));
 
+        jTable1.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
