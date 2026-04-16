@@ -4,30 +4,32 @@
  */
 package GUI;
 
-    import java.awt.Color;
-    import java.awt.event.FocusEvent;
-    import java.awt.event.FocusListener;
-    import java.sql.Connection;
-    import java.sql.PreparedStatement;
-    import java.sql.ResultSet;
-    import java.sql.SQLException;
-    import javax.swing.JOptionPane;
+import java.awt.Color;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger; 
+import javax.swing.JOptionPane;
 
-public class Login extends javax.swing.JFrame {
-
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Login.class.getName());
-
+    public class Login extends javax.swing.JFrame { 
+    
+    private static final Logger logger = Logger.getLogger(Login.class.getName());   
+    
     public Login() {
         initComponents();
         this.setLocationRelativeTo(null);
 
-        // 1. Setup Placeholders for Username and Password
+        // 1. Setup Placeholders
         setupPlaceholders();
 
-        // 2. Style buttons to be transparent "Ink" text
+        // 2. Style Register button to be transparent
         styleTransparentButton(jButton2);
 
-        // 3. Fix the Layering (Z-Order)
+        // 3. Fix Layering for Absolute Layout
         if (jPanel3.getComponentCount() > 0) {
             jPanel3.setComponentZOrder(jLabel8, jPanel3.getComponentCount() - 1);
         }
@@ -46,7 +48,7 @@ public class Login extends javax.swing.JFrame {
     }
 
     private void setupPlaceholders() {
-        // --- Username Logic ---
+        // Username Placeholder Logic
         Username.setText("Username");
         Username.setForeground(Color.GRAY);
         Username.addFocusListener(new FocusListener() {
@@ -66,7 +68,7 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
-        // --- Password Logic ---
+        // Password Placeholder Logic
         password.setEchoChar((char) 0); 
         password.setText("Chakra Key");
         password.setForeground(Color.GRAY);
@@ -99,6 +101,7 @@ public class Login extends javax.swing.JFrame {
         if (showpass.isSelected()) {
             password.setEchoChar((char) 0);
         } else {
+            // Only set echo char if it's not the placeholder
             if (!pass.equals("Chakra Key") && !pass.isEmpty()) {
                 password.setEchoChar('•');
             } else {
@@ -228,39 +231,39 @@ public class Login extends javax.swing.JFrame {
        String typedUser = Username.getText().trim();
         String typedPass = new String(password.getPassword());
         
-        // Prevent login if placeholders are still present
         if (typedUser.equals("Username") || typedPass.equals("Chakra Key") || typedUser.isEmpty()) {
             JOptionPane.showMessageDialog(this, "The scroll is empty. Enter your credentials.");
             return;
         }
 
-        // --- MYSQL CONNECTION LOGIC ---
         try (Connection conn = Database.getConnection()) {
             if (conn == null) {
-                JOptionPane.showMessageDialog(this, "Cannot connect to the Shinobi registry (it26).");
+                JOptionPane.showMessageDialog(this, "The Shinobi registry is unreachable.");
                 return;
             }
 
-            // Prepared Statement to prevent SQL Injection
-            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, typedUser);
-            pst.setString(2, typedPass);
+            // UPDATED: Check 'account_credentials' table instead of 'users'
+            String sql = "SELECT username FROM account_credentials WHERE username = ? AND password = ?";
+            try (PreparedStatement pst = conn.prepareStatement(sql)) {
+                pst.setString(1, typedUser);
+                pst.setString(2, typedPass);
 
-            ResultSet rs = pst.executeQuery();
-
-            if (rs.next()) {
-                JOptionPane.showMessageDialog(this, "Access Granted, Ninja!");
-                new Dashboard(typedUser).setVisible(true);
-                this.dispose();
-            } else {
-                // Hardcoded Admin fallback
-                if (typedUser.equals("Admin") && typedPass.equals("1234")) {
-                    JOptionPane.showMessageDialog(this, "Admin Access Granted!");
-                    new Dashboard(typedUser).setVisible(true);
-                    this.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Invalid credentials! Your jutsu is weak.", "Denied", JOptionPane.ERROR_MESSAGE);
+                try (ResultSet rs = pst.executeQuery()) {
+                    if (rs.next()) {
+                        JOptionPane.showMessageDialog(this, "Access Granted, Ninja!");
+                        // Pass the username to the Dashboard if needed
+                        new Dashboard(typedUser).setVisible(true);
+                        this.dispose();
+                    } else {
+                        // Admin fallback
+                        if (typedUser.equals("Admin") && typedPass.equals("1234")) {
+                            JOptionPane.showMessageDialog(this, "Admin Access Granted!");
+                            new Dashboard(typedUser).setVisible(true);
+                            this.dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Invalid credentials! Your jutsu is weak.", "Denied", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -290,7 +293,7 @@ public class Login extends javax.swing.JFrame {
                 }
             }
         } catch (Exception ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         java.awt.EventQueue.invokeLater(() -> new Login().setVisible(true));
     }
