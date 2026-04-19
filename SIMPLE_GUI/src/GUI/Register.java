@@ -64,7 +64,7 @@ public class Register extends javax.swing.JFrame {
             public void focusGained(FocusEvent evt) {
                 if (textField.getText().equals(placeholder)) {
                     textField.setText("");
-                    textField.setForeground(new Color(46, 26, 5)); // Ink Brown
+                    textField.setForeground(new Color(46, 26, 5)); 
                     if (textField instanceof JPasswordField jPasswordField) {
                         jPasswordField.setEchoChar('•');
                     }
@@ -282,63 +282,55 @@ public class Register extends javax.swing.JFrame {
     String pass1 = new String(password.getPassword());
     String pass2 = new String(confirmpass.getPassword());
 
-    // 2. Strict Validation: Ensure no fields are empty AND no placeholders are used as real data
+    // 2. Strict Validation
     if (user.isEmpty() || user.equals("Shinobi Name: (Username)") ||
         cln.isEmpty() || cln.equals("Clan Lineage:") ||
         rankLevel.isEmpty() || rankLevel.equals("Rank:") || 
         village.isEmpty() || village.equals("Village Origin") ||
         pass1.isEmpty() || pass1.equals("Chakra Key: (Password)")) {
         
-        JOptionPane.showMessageDialog(this, "All scrolls must be filled correctly! ⚠️", "Incomplete Jutsu", JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this, "All scrolls must be filled correctly! ⚠️");
         return;
     }
 
-    // 3. Password Match Check
     if (!pass1.equals(pass2)) {
-        JOptionPane.showMessageDialog(this, "The Forbidden Seals do not match! ❌", "Chakra Mismatch", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "The Forbidden Seals do not match! ❌");
         return;
     }
 
-    // 4. Database Transaction
     try (Connection conn = Database.getConnection()) {
-        if (conn == null) {
-            JOptionPane.showMessageDialog(this, "The Village Gates are closed. (Database Connection Failed)");
-            return;
-        }
+        if (conn == null) return;
 
         conn.setAutoCommit(false); // Start Transaction
 
         try {
-            // A. Check if Username already exists
+            // A. Check if Username exists
             String checkSql = "SELECT username FROM account_credentials WHERE username = ?";
             try (PreparedStatement checkPst = conn.prepareStatement(checkSql)) {
                 checkPst.setString(1, user);
-                try (ResultSet rsCheck = checkPst.executeQuery()) {
-                    if (rsCheck.next()) {
-                        JOptionPane.showMessageDialog(this, "That name is already in the registry!");
-                        conn.rollback();
-                        return;
-                    }
+                if (checkPst.executeQuery().next()) {
+                    JOptionPane.showMessageDialog(this, "That name is already in the registry!");
+                    conn.rollback();
+                    return;
                 }
             }
 
-            // B. Insert into account_credentials and get the generated ID
+            // B. Insert into account_credentials
             String sqlAcc = "INSERT INTO account_credentials (username, password) VALUES (?, ?)";
             int generatedId = -1;
-            try (PreparedStatement pstAcc = conn.prepareStatement(sqlAcc, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement pstAcc = conn.prepareStatement(sqlAcc, Statement.RETURN_GENERATED_KEYS)) {
                 pstAcc.setString(1, user);
                 pstAcc.setString(2, pass1);
                 pstAcc.executeUpdate();
 
                 try (ResultSet rs = pstAcc.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        generatedId = rs.getInt(1);
-                    }
+                    if (rs.next()) generatedId = rs.getInt(1);
                 }
             }
 
-            // C. Insert into shinobi_profiles using the ID from step B
+            // C. UPDATED: Insert into shinobi_profiles (REMOVED profile_id)
             if (generatedId != -1) {
+                // We only use 4 columns now: user_id, clan, rank, village
                 String sqlProf = "INSERT INTO shinobi_profiles (user_id, clan, rank, village) VALUES (?, ?, ?, ?)";
                 try (PreparedStatement pstProf = conn.prepareStatement(sqlProf)) {
                     pstProf.setInt(1, generatedId);
@@ -347,28 +339,20 @@ public class Register extends javax.swing.JFrame {
                     pstProf.setString(4, village);
                     pstProf.executeUpdate();
                 }
-            } else {
-                throw new SQLException("Failed to retrieve User ID for profile creation.");
             }
 
-            // D. Commit the transaction
             conn.commit(); 
-            JOptionPane.showMessageDialog(this, "Welcome, " + user + "! Your profile has been sealed in the scrolls.");
-            
-            // Redirect to Login
+            JOptionPane.showMessageDialog(this, "Welcome, " + user + "! Your profile is sealed.");
             new Login().setVisible(true);
             this.dispose();
 
         } catch (SQLException e) {
-            conn.rollback(); // Undo everything if any part fails
-            JOptionPane.showMessageDialog(this, "Jutsu Failed! Registry Error: " + e.getMessage());
-        } finally {
-            conn.setAutoCommit(true);
+            conn.rollback();
+            JOptionPane.showMessageDialog(this, "Jutsu Failed: " + e.getMessage());
         }
     } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Connection Error: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
     }
-
     }//GEN-LAST:event_signupActionPerformed
 
     private void passwordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordActionPerformed

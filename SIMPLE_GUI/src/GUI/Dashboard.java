@@ -23,7 +23,6 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Dashboard extends javax.swing.JFrame {
 
-    // Capacity increased to 5 strings to hold: Name, Clan, Rank, Village, and Access
     private ArrayList<String[]> players = new ArrayList<>();
     private String loggedInUser;
     
@@ -51,39 +50,30 @@ public class Dashboard extends javax.swing.JFrame {
 
     private void loadInitialData() {
         players.clear();
-        
-        // SQL now uses the LEFT JOIN to bring in the access_level from rank_privileges
-        String sql = "SELECT c.username, p.clan, p.rank, p.village, v.access_level " +
+        // SQL selecting username (Name) and user_id along with profile details
+        String sql = "SELECT c.username, p.user_id, p.clan, p.rank, p.village " +
                      "FROM account_credentials c " +
-                     "JOIN shinobi_profiles p ON c.user_id = p.user_id " +
-                     "LEFT JOIN rank_privileges v ON p.rank = v.rank_name";
+                     "JOIN shinobi_profiles p ON c.user_id = p.user_id";
         
         try (Connection conn = Database.getConnection();
              PreparedStatement pst = conn.prepareStatement(sql);
              ResultSet rs = pst.executeQuery()) {
             
             while (rs.next()) {
-                String name = rs.getString("username");
-                String clan = rs.getString("clan");
-                String rank = rs.getString("rank");
-                String village = rs.getString("village");
-                String access = rs.getString("access_level");
-
-                // Adding 5 columns to our internal list
                 players.add(new String[]{
-                    name != null ? name : "Unknown",
-                    clan != null ? clan : "No Clan",
-                    rank != null ? rank : "Unranked",
-                    village != null ? village : "Wanderer",
-                    access != null ? access : "No Privileges" // New Column
+                    String.valueOf(rs.getInt("user_id")), // ID Column
+                    rs.getString("username") != null ? rs.getString("username") : "Unknown",
+                    rs.getString("clan") != null ? rs.getString("clan") : "No Clan",
+                    rs.getString("rank") != null ? rs.getString("rank") : "Unranked",
+                    rs.getString("village") != null ? rs.getString("village") : "Wanderer"
                 });
             }
         } catch (SQLException e) {
-            System.out.println("Dashboard Load Error: " + e.getMessage());
             JOptionPane.showMessageDialog(this, "Failed to load the Shinobi Scrolls!");
         }
     }
 
+    // This method was missing in your previous version
     private void refreshTable() {
         updateTableContent(players);
     }
@@ -91,11 +81,7 @@ public class Dashboard extends javax.swing.JFrame {
     private void updateTableContent(ArrayList<String[]> list) {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setRowCount(0); 
-        
-        // Ensure the table model matches the 5-column structure
-        if (model.getColumnCount() < 5) {
-            model.setColumnIdentifiers(new String[]{"Name", "Clan", "Rank", "Village", "Access Level"});
-        }
+        model.setColumnIdentifiers(new String[]{"Shinobi Name", "User ID", "Clan", "Rank", "Village"});
 
         for (String[] p : list) {
             model.addRow(p);
@@ -106,7 +92,7 @@ public class Dashboard extends javax.swing.JFrame {
         String query = search.getText().toLowerCase();
         ArrayList<String[]> filteredList = new ArrayList<>();
         for (String[] p : players) {
-            // Updated to check all 5 columns including Access Level
+            // Checks all 5 columns: Name, ID, Clan, Rank, Village
             if (p[0].toLowerCase().contains(query) || 
                 p[1].toLowerCase().contains(query) || 
                 p[2].toLowerCase().contains(query) || 
@@ -121,13 +107,10 @@ public class Dashboard extends javax.swing.JFrame {
     private void applySort() {
         int choice = sort.getSelectedIndex();
         Collections.sort(players, (String[] s1, String[] s2) -> {
-            switch (choice) {
-                case 0: return s1[0].compareToIgnoreCase(s2[0]); // Name
-                case 1: return s1[1].compareToIgnoreCase(s2[1]); // Clan 
-                case 2: return s1[2].compareToIgnoreCase(s2[2]); // Rank
-                case 3: return s1[3].compareToIgnoreCase(s2[3]); // Village
-                default: return 0;
+            if (choice < s1.length) {
+                return s1[choice].compareToIgnoreCase(s2[choice]);
             }
+            return 0;
         });
         filterTable(); 
     }
@@ -279,63 +262,75 @@ public class Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateActionPerformed
-            int row = jTable1.getSelectedRow();
-        if (row != -1) {
-            String targetUser = (String) jTable1.getValueAt(row, 0);
-            String newClan = JOptionPane.showInputDialog(this, "Update Clan:", jTable1.getValueAt(row, 1));
-            String newRank = JOptionPane.showInputDialog(this, "Update Rank:", jTable1.getValueAt(row, 2));
-            String newVillage = JOptionPane.showInputDialog(this, "Update Village:", jTable1.getValueAt(row, 3));
+    int row = jTable1.getSelectedRow();
+    if (row != -1) {
+        // Get the ID and current values from the correct columns
+        String targetId = (String) jTable1.getValueAt(row, 1); 
+        String currentClan = (String) jTable1.getValueAt(row, 2);
+        String currentRank = (String) jTable1.getValueAt(row, 3);
+        String currentVillage = (String) jTable1.getValueAt(row, 4);
 
-            if (newClan != null && newRank != null && newVillage != null) {
-                try (Connection conn = Database.getConnection()) {
-                    String sql = "UPDATE shinobi_profiles p " +
-                                 "JOIN account_credentials c ON p.user_id = c.user_id " +
-                                 "SET p.clan = ?, p.rank = ?, p.village = ? " +
-                                 "WHERE c.username = ?";
-                    PreparedStatement pst = conn.prepareStatement(sql);
-                    pst.setString(1, newClan);
-                    pst.setString(2, newRank);
-                    pst.setString(3, newVillage);
-                    pst.setString(4, targetUser);
-                    pst.executeUpdate();
-                    
-                    JOptionPane.showMessageDialog(this, "Archives Updated!");
-                    loadInitialData();
-                    refreshTable();
-                } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(this, "Update Failed: " + e.getMessage());
-                }
+        // Ask for new info, showing current info as default
+        String newClan = JOptionPane.showInputDialog(this, "Update Clan:", currentClan);
+        String newRank = JOptionPane.showInputDialog(this, "Update Rank:", currentRank);
+        String newVillage = JOptionPane.showInputDialog(this, "Update Village:", currentVillage);
+
+        if (newClan != null && newRank != null && newVillage != null) {
+            try (Connection conn = Database.getConnection()) {
+                // Simplified SQL: Update by user_id directly
+                String sql = "UPDATE shinobi_profiles SET clan = ?, rank = ?, village = ? WHERE user_id = ?";
+                
+                PreparedStatement pst = conn.prepareStatement(sql);
+                pst.setString(1, newClan);
+                pst.setString(2, newRank);
+                pst.setString(3, newVillage);
+                pst.setInt(4, Integer.parseInt(targetId)); // Use the ID
+                
+                pst.executeUpdate();
+                
+                // Refresh data
+                loadInitialData();
+                refreshTable();
+                JOptionPane.showMessageDialog(this, "Archives Updated!");
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Update Failed: " + e.getMessage());
             }
-        } else {
-            JOptionPane.showMessageDialog(this, "Select a Shinobi first!");
         }
+    } else {
+        JOptionPane.showMessageDialog(this, "Select a Shinobi from the table first!");
+    }
     }//GEN-LAST:event_updateActionPerformed
 
     private void readActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readActionPerformed
-                                                                  
+                                                                                                  
     int row = jTable1.getSelectedRow();
-        if (row != -1) {
-            String intel = " 🛡 TARGET CLASSIFIED DATA \n" +
-                           "==========================\n" +
-                           " NAME      : " + jTable1.getValueAt(row, 0) + "\n" +
-                           " CLAN      : " + jTable1.getValueAt(row, 1) + "\n" +
-                           " RANK      : " + jTable1.getValueAt(row, 2) + "\n" +
-                           " VILLAGE   : " + jTable1.getValueAt(row, 3) + "\n" +
-                           " PRIVILEGE : " + jTable1.getValueAt(row, 4) + "\n" +
-                           "==========================";
-            JOptionPane.showMessageDialog(this, intel, "Intel Decrypted", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(this, "Select a target!");
-        }
+    if (row != -1) {
+        // Correcting the indices based on your updateTableContent order:
+        // 0: Name, 1: ID, 2: Clan, 3: Rank, 4: Village
+        String intel = " 🛡 TARGET CLASSIFIED DATA \n" +
+                       "==========================\n" +
+                       " NAME      : " + jTable1.getValueAt(row, 0) + "\n" +
+                       " ID        : " + jTable1.getValueAt(row, 1) + "\n" +
+                       " CLAN      : " + jTable1.getValueAt(row, 2) + "\n" +
+                       " RANK      : " + jTable1.getValueAt(row, 3) + "\n" +
+                       " VILLAGE   : " + jTable1.getValueAt(row, 4) + "\n" +
+                       "==========================";
+        JOptionPane.showMessageDialog(this, intel, "Intel Decrypted", JOptionPane.INFORMATION_MESSAGE);
+    } else {
+        JOptionPane.showMessageDialog(this, "Select a target from the scrolls!");
+    }
     }//GEN-LAST:event_readActionPerformed
     private void createActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createActionPerformed
                                       
-         String newName = JOptionPane.showInputDialog(this, "Enter Username:");
+        String newName = JOptionPane.showInputDialog(this, "Enter Shinobi Name:");
         if (newName == null || newName.trim().isEmpty()) return;
-        String newPass = JOptionPane.showInputDialog(this, "Set Password:");
-        String newClan = JOptionPane.showInputDialog(this, "Enter Clan:");
-        String newRank = JOptionPane.showInputDialog(this, "Set Rank:");
-        String newVillage = JOptionPane.showInputDialog(this, "Set Village:");
+        
+        String newPass = JOptionPane.showInputDialog(this, "Set Secret Password:");
+        if (newPass == null || newPass.trim().isEmpty()) return;
+        
+        String newClan = JOptionPane.showInputDialog(this, "Assign Clan:");
+        String newRank = JOptionPane.showInputDialog(this, "Assign Rank:");
+        String newVillage = JOptionPane.showInputDialog(this, "Assign Village:");
 
         try (Connection conn = Database.getConnection()) {
             conn.setAutoCommit(false);
@@ -351,17 +346,18 @@ public class Dashboard extends javax.swing.JFrame {
                 String sqlProf = "INSERT INTO shinobi_profiles (user_id, clan, rank, village) VALUES (?, ?, ?, ?)";
                 PreparedStatement pstProf = conn.prepareStatement(sqlProf);
                 pstProf.setInt(1, uid);
-                pstProf.setString(2, newClan);
-                pstProf.setString(3, newRank);
-                pstProf.setString(4, newVillage);
+                pstProf.setString(2, newClan != null ? newClan : "Unknown");
+                pstProf.setString(3, newRank != null ? newRank : "Genin");
+                pstProf.setString(4, newVillage != null ? newVillage : "Wanderer");
                 pstProf.executeUpdate();
             }
             conn.commit();
             loadInitialData();
             refreshTable();
+            JOptionPane.showMessageDialog(this, "New Shinobi registered to the scrolls!");
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Creation Failed: " + e.getMessage());
-        }               
+            JOptionPane.showMessageDialog(this, "Registration Failed: " + e.getMessage());
+        }           
     }//GEN-LAST:event_createActionPerformed
 
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
@@ -369,15 +365,12 @@ public class Dashboard extends javax.swing.JFrame {
         if (row != -1) {
             String nameToDelete = (String) jTable1.getValueAt(row, 0);
             int confirm = JOptionPane.showConfirmDialog(this, "Permanently exile " + nameToDelete + "?", "Confirm", JOptionPane.YES_NO_OPTION);
-            
             if (confirm == JOptionPane.YES_OPTION) {
                 try (Connection conn = Database.getConnection()) {
-                    // This will delete from both tables if Foreign Key ON DELETE CASCADE is set
                     String sql = "DELETE FROM account_credentials WHERE username = ?";
                     PreparedStatement pst = conn.prepareStatement(sql);
                     pst.setString(1, nameToDelete);
                     pst.executeUpdate();
-                    
                     loadInitialData();
                     refreshTable();
                 } catch (SQLException e) {

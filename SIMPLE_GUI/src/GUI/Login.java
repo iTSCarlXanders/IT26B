@@ -228,47 +228,42 @@ import javax.swing.JOptionPane;
     }// </editor-fold>//GEN-END:initComponents
 
     private void accessportalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accessportalActionPerformed
-       String typedUser = Username.getText().trim();
-        String typedPass = new String(password.getPassword());
-        
-        if (typedUser.equals("Username") || typedPass.equals("Chakra Key") || typedUser.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "The scroll is empty. Enter your credentials.");
-            return;
-        }
+      String typedUser = Username.getText().trim();
+    String typedPass = new String(password.getPassword());
+    
+    // Placeholder check
+    if (typedUser.equals("Username") || typedPass.equals("Chakra Key") || typedUser.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "The scroll is empty. Enter your credentials.");
+        return;
+    }
 
-        try (Connection conn = Database.getConnection()) {
-            if (conn == null) {
-                JOptionPane.showMessageDialog(this, "The Shinobi registry is unreachable.");
-                return;
-            }
+    // Admin Bypass Logic
+    if (typedUser.equals("Admin") && typedPass.equals("1234")) {
+        JOptionPane.showMessageDialog(this, "Admin Access Granted!");
+        new Dashboard(typedUser).setVisible(true);
+        this.dispose();
+        return;
+    }
 
-            // UPDATED: Check 'account_credentials' table instead of 'users'
-            String sql = "SELECT username FROM account_credentials WHERE username = ? AND password = ?";
-            try (PreparedStatement pst = conn.prepareStatement(sql)) {
-                pst.setString(1, typedUser);
-                pst.setString(2, typedPass);
+    try (Connection conn = Database.getConnection()) {
+        String sql = "SELECT username FROM account_credentials WHERE username = ? AND password = ?";
+        try (PreparedStatement pst = conn.prepareStatement(sql)) {
+            pst.setString(1, typedUser);
+            pst.setString(2, typedPass);
 
-                try (ResultSet rs = pst.executeQuery()) {
-                    if (rs.next()) {
-                        JOptionPane.showMessageDialog(this, "Access Granted, Ninja!");
-                        // Pass the username to the Dashboard if needed
-                        new Dashboard(typedUser).setVisible(true);
-                        this.dispose();
-                    } else {
-                        // Admin fallback
-                        if (typedUser.equals("Admin") && typedPass.equals("1234")) {
-                            JOptionPane.showMessageDialog(this, "Admin Access Granted!");
-                            new Dashboard(typedUser).setVisible(true);
-                            this.dispose();
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Invalid credentials! Your jutsu is weak.", "Denied", JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    JOptionPane.showMessageDialog(this, "Access Granted, Ninja!");
+                    new Dashboard(typedUser).setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Invalid credentials! Your jutsu is weak.", "Denied", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
         }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Registry Error: " + e.getMessage());
+    }
     }//GEN-LAST:event_accessportalActionPerformed
 
     private void UsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UsernameActionPerformed
