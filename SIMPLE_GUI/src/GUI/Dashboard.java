@@ -109,15 +109,27 @@ public class Dashboard extends javax.swing.JFrame {
     }
 
     private void applySort() {
-        int choice = sort.getSelectedIndex();
-        Collections.sort(players, (String[] s1, String[] s2) -> {
-            if (choice < s1.length) {
-                return s1[choice].compareToIgnoreCase(s2[choice]);
+    int choice = sort.getSelectedIndex(); // 0 = ID, 1 = Name
+
+    Collections.sort(players, (String[] s1, String[] s2) -> {
+        // Option 0: Sort by ID (Numerical)
+        if (choice == 0) {
+            try {
+                int id1 = Integer.parseInt(s1[0]);
+                int id2 = Integer.parseInt(s2[0]);
+                return Integer.compare(id1, id2);
+            } catch (NumberFormatException e) {
+                return 0;
             }
-            return 0;
-        });
-        filterTable(); 
-    }
+        }
+        
+        // Option 1: Sort by Name (Alphabetical)
+        // We use Index 1 because 'username' is the second item in our data
+        return s1[1].compareToIgnoreCase(s2[1]);
+    });
+    
+    filterTable(); 
+}
 
     private void stylizeInterface() {
         jPanel2.setOpaque(false);
@@ -165,7 +177,12 @@ public class Dashboard extends javax.swing.JFrame {
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         sort.setFont(new java.awt.Font("Segoe Print", 1, 12)); // NOI18N
-        sort.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Name", "Clan", "Rank", "Origin" }));
+        sort.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ID", "Name" }));
+        sort.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sortActionPerformed(evt);
+            }
+        });
         jPanel2.add(sort, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 110, 90, 20));
 
         update.setFont(new java.awt.Font("Segoe Print", 1, 14)); // NOI18N
@@ -405,6 +422,10 @@ public class Dashboard extends javax.swing.JFrame {
     private void searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_searchActionPerformed
+
+    private void sortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_sortActionPerformed
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(() -> new Dashboard("Guest").setVisible(true));

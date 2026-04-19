@@ -246,7 +246,7 @@ import javax.swing.JOptionPane;
     }
 
     try (Connection conn = Database.getConnection()) {
-        String sql = "SELECT username FROM account_credentials WHERE username = ? AND password = ?";
+        String sql = "SELECT username FROM accounts WHERE username = ? AND password = ?";
         try (PreparedStatement pst = conn.prepareStatement(sql)) {
             pst.setString(1, typedUser);
             pst.setString(2, typedPass);
