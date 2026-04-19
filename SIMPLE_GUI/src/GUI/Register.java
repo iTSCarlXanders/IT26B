@@ -305,7 +305,7 @@ public class Register extends javax.swing.JFrame {
 
         try {
             // A. Check if Username exists
-            String checkSql = "SELECT username FROM account_credentials WHERE username = ?";
+            String checkSql = "SELECT username FROM accounts WHERE username = ?";
             try (PreparedStatement checkPst = conn.prepareStatement(checkSql)) {
                 checkPst.setString(1, user);
                 if (checkPst.executeQuery().next()) {
@@ -316,7 +316,7 @@ public class Register extends javax.swing.JFrame {
             }
 
             // B. Insert into account_credentials
-            String sqlAcc = "INSERT INTO account_credentials (username, password) VALUES (?, ?)";
+            String sqlAcc = "INSERT INTO accounts (username, password) VALUES (?, ?)";
             int generatedId = -1;
             try (PreparedStatement pstAcc = conn.prepareStatement(sqlAcc, Statement.RETURN_GENERATED_KEYS)) {
                 pstAcc.setString(1, user);
