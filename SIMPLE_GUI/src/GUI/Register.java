@@ -329,16 +329,17 @@ public class Register extends javax.swing.JFrame {
             }
 
             // C. UPDATED: Insert into shinobi_profiles (REMOVED profile_id)
-            if (generatedId != -1) {
-                // We only use 4 columns now: user_id, clan, rank, village
-                String sqlProf = "INSERT INTO shinobi_profiles (user_id, clan, rank, village) VALUES (?, ?, ?, ?)";
-                try (PreparedStatement pstProf = conn.prepareStatement(sqlProf)) {
-                    pstProf.setInt(1, generatedId);
-                    pstProf.setString(2, cln);
-                    pstProf.setString(3, rankLevel);
-                    pstProf.setString(4, village);
-                    pstProf.executeUpdate();
-                }
+           if (generatedId != -1) {
+    // We include 'shinobi_name' so the database isn't empty!
+    String sqlProf = "INSERT INTO shinobi_profiles (user_id, shinobi_name, clan, rank, village) VALUES (?, ?, ?, ?, ?)";
+    try (PreparedStatement pstProf = conn.prepareStatement(sqlProf)) {
+        pstProf.setInt(1, generatedId);
+        pstProf.setString(2, user); // Use the username as the Shinobi Name
+        pstProf.setString(3, cln);
+        pstProf.setString(4, rankLevel);
+        pstProf.setString(5, village);
+        pstProf.executeUpdate();
+    }
             }
 
             conn.commit(); 
