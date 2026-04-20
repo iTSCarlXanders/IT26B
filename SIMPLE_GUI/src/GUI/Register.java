@@ -294,7 +294,7 @@ public class Register extends javax.swing.JFrame {
     }
 
     if (!pass1.equals(pass2)) {
-        JOptionPane.showMessageDialog(this, "The Chakra Key do not match! ❌");
+        JOptionPane.showMessageDialog(this, "The Chakra Key does not match! ❌");
         return;
     }
 
