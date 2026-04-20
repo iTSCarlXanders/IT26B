@@ -50,10 +50,8 @@ public class Dashboard extends javax.swing.JFrame {
 
     private void loadInitialData() {
     players.clear();
-    // CHANGED: Fetch p.shinobi_name instead of a.username
-    String sql = "SELECT p.user_id, p.shinobi_name, p.clan, p.rank, p.village " +
-                 "FROM shinobi_profiles p " +
-                 "JOIN accounts a ON p.user_id = a.user_id";
+    // pull everything from shinobi_profiles
+    String sql = "SELECT user_id, shinobi_name, clan, rank, village FROM shinobi_profiles";
     
     try (Connection conn = Database.getConnection();
          PreparedStatement pst = conn.prepareStatement(sql);
@@ -62,15 +60,14 @@ public class Dashboard extends javax.swing.JFrame {
         while (rs.next()) {
             players.add(new String[]{
                 String.valueOf(rs.getInt("user_id")),
-                // CHANGED: Use shinobi_name here so it matches what you update
-                rs.getString("shinobi_name") != null ? rs.getString("shinobi_name") : "Unknown", 
+                rs.getString("shinobi_name") != null ? rs.getString("shinobi_name") : "Unknown",
                 rs.getString("clan") != null ? rs.getString("clan") : "No Clan",
                 rs.getString("rank") != null ? rs.getString("rank") : "Unranked",
                 rs.getString("village") != null ? rs.getString("village") : "Wanderer"
             });
         }
     } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Failed to load: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, "Failed to load the Shinobi Scrolls! Error: " + e.getMessage());
     }
 }
 
