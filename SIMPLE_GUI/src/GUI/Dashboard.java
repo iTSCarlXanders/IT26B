@@ -50,8 +50,8 @@ public class Dashboard extends javax.swing.JFrame {
 
     private void loadInitialData() {
     players.clear();
-    // SQL joins the 'accounts' table with the 'shinobi_profiles' stats
-    String sql = "SELECT p.user_id, a.username, p.clan, p.rank, p.village " +
+    // CHANGED: Fetch p.shinobi_name instead of a.username
+    String sql = "SELECT p.user_id, p.shinobi_name, p.clan, p.rank, p.village " +
                  "FROM shinobi_profiles p " +
                  "JOIN accounts a ON p.user_id = a.user_id";
     
@@ -61,15 +61,16 @@ public class Dashboard extends javax.swing.JFrame {
         
         while (rs.next()) {
             players.add(new String[]{
-                String.valueOf(rs.getInt("user_id")),                                    // Index 0: User ID
-                rs.getString("username") != null ? rs.getString("username") : "Unknown", // Index 1: Shinobi Name
-                rs.getString("clan") != null ? rs.getString("clan") : "No Clan",         // Index 2: Clan
-                rs.getString("rank") != null ? rs.getString("rank") : "Unranked",       // Index 3: Rank
-                rs.getString("village") != null ? rs.getString("village") : "Wanderer"   // Index 4: Village
+                String.valueOf(rs.getInt("user_id")),
+                // CHANGED: Use shinobi_name here so it matches what you update
+                rs.getString("shinobi_name") != null ? rs.getString("shinobi_name") : "Unknown", 
+                rs.getString("clan") != null ? rs.getString("clan") : "No Clan",
+                rs.getString("rank") != null ? rs.getString("rank") : "Unranked",
+                rs.getString("village") != null ? rs.getString("village") : "Wanderer"
             });
         }
     } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Failed to load the Shinobi Scrolls! Error: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, "Failed to load: " + e.getMessage());
     }
 }
 
@@ -79,7 +80,7 @@ public class Dashboard extends javax.swing.JFrame {
     }
 
     private void updateTableContent(ArrayList<String[]> list) {
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    DefaultTableModel model = (DefaultTableModel) Table.getModel();
     model.setRowCount(0); 
     
     // Ensure these match the order in the while loop above!
@@ -135,7 +136,7 @@ public class Dashboard extends javax.swing.JFrame {
         jPanel2.setOpaque(false);
         jScrollPane1.setOpaque(false);
         jScrollPane1.getViewport().setOpaque(false);
-        jTable1.setOpaque(false);
+        Table.setOpaque(false);
             
         search.setBackground(new Color(30, 30, 30));
         search.setForeground(Color.WHITE);
@@ -164,7 +165,7 @@ public class Dashboard extends javax.swing.JFrame {
         delete = new javax.swing.JButton();
         Logout = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        Table = new javax.swing.JTable();
         search = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -235,8 +236,8 @@ public class Dashboard extends javax.swing.JFrame {
         });
         jPanel2.add(Logout, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 400, 110, 40));
 
-        jTable1.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        Table.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
+        Table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -247,7 +248,7 @@ public class Dashboard extends javax.swing.JFrame {
                 "Name", "Clan", "Rank", "Village(Affiliation)"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(Table);
 
         jPanel2.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 130, 450, 310));
 
@@ -283,23 +284,32 @@ public class Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateActionPerformed
-    int row = jTable1.getSelectedRow();
+    int row = Table.getSelectedRow();
+    
     if (row != -1) {
-        String targetId = (String) jTable1.getValueAt(row, 0); 
-        String currentName = (String) jTable1.getValueAt(row, 1);
-        String currentClan = (String) jTable1.getValueAt(row, 2);
-        String currentRank = (String) jTable1.getValueAt(row, 3);
-        String currentVillage = (String) jTable1.getValueAt(row, 4);
+        // 1. Get current values from the table (Safely convert to String)
+        String targetId      = String.valueOf(Table.getValueAt(row, 0)); 
+        String currentName   = String.valueOf(Table.getValueAt(row, 1));
+        String currentClan   = String.valueOf(Table.getValueAt(row, 2));
+        String currentRank   = String.valueOf(Table.getValueAt(row, 3));
+        String currentVillage = String.valueOf(Table.getValueAt(row, 4));
 
-        String newName = JOptionPane.showInputDialog(this, "Update Name:", currentName);
-        if (newName == null || newName.trim().isEmpty()) return;
+        // 2. Ask for new values (Show current value as the default)
+        String newName = JOptionPane.showInputDialog(this, "Update Shinobi Name:", currentName);
+        if (newName == null || newName.trim().isEmpty()) return; // Cancel if empty
 
         String newClan = JOptionPane.showInputDialog(this, "Update Clan:", currentClan);
-        String newRank = JOptionPane.showInputDialog(this, "Update Rank:", currentRank);
-        String newVillage = JOptionPane.showInputDialog(this, "Update Village/Origin:", currentVillage);
+        if (newClan == null) return;
 
+        String newRank = JOptionPane.showInputDialog(this, "Update Rank:", currentRank);
+        if (newRank == null) return;
+
+        String newVillage = JOptionPane.showInputDialog(this, "Update Village:", currentVillage);
+        if (newVillage == null) return;
+
+        // 3. Execute Database Update
         try (Connection conn = Database.getConnection()) {
-            // Updating only the profile table
+            // We update the 'shinobi_profiles' table using the 'user_id'
             String sql = "UPDATE shinobi_profiles SET shinobi_name = ?, clan = ?, rank = ?, village = ? WHERE user_id = ?";
             PreparedStatement pst = conn.prepareStatement(sql);
             
@@ -309,30 +319,36 @@ public class Dashboard extends javax.swing.JFrame {
             pst.setString(4, newVillage);
             pst.setInt(5, Integer.parseInt(targetId));
             
-            pst.executeUpdate();
-            loadInitialData();
-            refreshTable();
-            JOptionPane.showMessageDialog(this, "Scroll Updated Successfully!");
+            int updatedRows = pst.executeUpdate();
+            
+            if (updatedRows > 0) {
+                // 4. Refresh the local ArrayList and the JTable
+                loadInitialData(); // Re-fetch from database
+                refreshTable();    // Redraw the table
+                JOptionPane.showMessageDialog(this, "The Shinobi Scroll has been updated!");
+            }
             
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Update Failed: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid ID Format!");
         }
     } else {
-        JOptionPane.showMessageDialog(this, "Please select a row first!");
+        JOptionPane.showMessageDialog(this, "Please select a Shinobi from the table first!");
     }
     }//GEN-LAST:event_updateActionPerformed
 
     private void readActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readActionPerformed
                                                                                                   
-    int row = jTable1.getSelectedRow();
+    int row = Table.getSelectedRow();
     if (row != -1) {
         String intel = " 🛡 TARGET CLASSIFIED DATA \n" +
                        "==========================\n" +
-                       " ID        : " + jTable1.getValueAt(row, 0) + "\n" +
-                       " NAME      : " + jTable1.getValueAt(row, 1) + "\n" +
-                       " CLAN      : " + jTable1.getValueAt(row, 2) + "\n" +
-                       " RANK      : " + jTable1.getValueAt(row, 3) + "\n" +
-                       " VILLAGE   : " + jTable1.getValueAt(row, 4) + "\n" +
+                       " ID        : " + Table.getValueAt(row, 0) + "\n" +
+                       " NAME      : " + Table.getValueAt(row, 1) + "\n" +
+                       " CLAN      : " + Table.getValueAt(row, 2) + "\n" +
+                       " RANK      : " + Table.getValueAt(row, 3) + "\n" +
+                       " VILLAGE   : " + Table.getValueAt(row, 4) + "\n" +
                        "==========================";
         JOptionPane.showMessageDialog(this, intel, "Intel Decrypted", JOptionPane.INFORMATION_MESSAGE);
     } else {
@@ -393,11 +409,11 @@ public class Dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_createActionPerformed
 
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
-    int row = jTable1.getSelectedRow();
+    int row = Table.getSelectedRow();
     if (row != -1) {
         // We get the ID from column 0
-        String idToDelete = (String) jTable1.getValueAt(row, 0); 
-        String nameToDelete = (String) jTable1.getValueAt(row, 1);
+        String idToDelete = (String) Table.getValueAt(row, 0); 
+        String nameToDelete = (String) Table.getValueAt(row, 1);
         
         int confirm = JOptionPane.showConfirmDialog(this, 
             "Permanently exile " + nameToDelete + " (ID: " + idToDelete + ")?", 
@@ -443,6 +459,7 @@ public class Dashboard extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Logout;
+    private javax.swing.JTable Table;
     private javax.swing.JButton create;
     private javax.swing.JButton delete;
     private javax.swing.JLabel jLabel1;
@@ -450,7 +467,6 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JButton read;
     private javax.swing.JTextField search;
     private javax.swing.JComboBox<String> sort;
