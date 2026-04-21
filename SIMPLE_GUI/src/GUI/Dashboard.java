@@ -339,9 +339,10 @@ public class Dashboard extends javax.swing.JFrame {
                                                                                                   
     int row = Table.getSelectedRow();
     if (row != -1) {
-        String intel = " 🛡 TARGET CLASSIFIED DATA \n" +
-                       "==========================\n" +
-                       " ID        : " + Table.getValueAt(row, 0) + "\n" +
+        String intel = """
+                        \ud83d\udee1 TARGET CLASSIFIED DATA 
+                       ==========================
+                        ID        : """ + Table.getValueAt(row, 0) + "\n" +
                        " NAME      : " + Table.getValueAt(row, 1) + "\n" +
                        " CLAN      : " + Table.getValueAt(row, 2) + "\n" +
                        " RANK      : " + Table.getValueAt(row, 3) + "\n" +
