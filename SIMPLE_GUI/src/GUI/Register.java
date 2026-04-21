@@ -330,7 +330,7 @@ public class Register extends javax.swing.JFrame {
 
             // C. UPDATED: Insert into shinobi_profiles (REMOVED profile_id)
            if (generatedId != -1) {
-    // We include 'shinobi_name' so the database isn't empty!
+    // include 'shinobi_name' so the database isn't empty!
     String sqlProf = "INSERT INTO shinobi_profiles (user_id, shinobi_name, clan, rank, village) VALUES (?, ?, ?, ?, ?)";
     try (PreparedStatement pstProf = conn.prepareStatement(sqlProf)) {
         pstProf.setInt(1, generatedId);
